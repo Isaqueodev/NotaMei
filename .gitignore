@@ -1,6 +1,13 @@
 /referencias de design/
 /docs/analise-requisitos-arquitetura.md
 
+# Local agent state, credentials and transfer archives (never publish)
+/.hermes/
+/.env
+*.jks
+*.keystore
+/hermes-*-aprendizado-*.zip
+
 # Flutter/Android generated files
 *.class
 *.log

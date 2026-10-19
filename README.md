@@ -76,3 +76,5 @@ O arquivo gerado fica em `build/app/outputs/flutter-apk/app-debug.apk`. Se for i
 ## Estado do projeto
 
 Esta versão cobre o fluxo local de apresentação e uso manual. Exportação/backup próprios, sincronização, integrações externas e regras fiscais automáticas **não estão implementados**. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
+
+Para continuar o desenvolvimento com o Hermes Agent em outro computador, consulte [as instruções de migração para Windows](docs/hermes/IMPORTAR-WINDOWS.md). Elas transferem apenas conhecimento revisado e não incluem dados de pesquisa, conversas ou credenciais.
