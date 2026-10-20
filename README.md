@@ -11,8 +11,8 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 | Área | Funcionalidade |
 | --- | --- |
 | Primeiro uso | Escolher entre um tour opcional e começar direto; rever o tour em **Ajustes**. |
-| Lançamentos | Registrar **entrada** ou **saída**, valor em reais, data, categoria e observação opcional; classificar manualmente como **Negócio** ou **Pessoal**. Editar e excluir registros. |
-| Início | Consultar entradas, saídas, balanço e lançamentos recentes do **negócio** no mês selecionado. O balanço é entradas menos saídas registradas, não o saldo de uma conta bancária. |
+| Lançamentos | Registrar **entrada** ou **saída**, valor em reais, data, categoria e observação opcional; classificar manualmente como **Negócio** ou **Pessoal**. Usar **Salvar e adicionar outro** para continuar no formulário, ou o salvamento normal para voltar. Editar e excluir registros. |
+| Início | Consultar entradas, saídas, balanço e lançamentos recentes no mês selecionado, filtrando **Negócio**, **Pessoal** ou **Todos**. O padrão é Negócio; Todos identifica explicitamente a soma geral dos dois âmbitos. O balanço é entradas menos saídas registradas, não o saldo de uma conta bancária. |
 | Histórico | Navegar por mês e filtrar os registros por Negócio/Pessoal e Entrada/Saída. |
 | Ano | Ver a soma por mês e o total das **entradas do negócio informadas** no ano corrente. Meses sem registro não são tratados como meses sem movimento. |
 | Ajustes | Ativar ou desativar um lembrete local relacionado ao DAS, escolhendo dia do mês e horário. Rever o tour. |
@@ -21,9 +21,10 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 
 1. Ao abrir o aplicativo pela primeira vez, escolha **Ver como funciona** ou **Começar sem tour**.
 2. Em **Início**, toque em **Novo Lançamento** e registre, por exemplo, uma venda como entrada do **Negócio**. Use exemplos fictícios ao demonstrar o app para outra pessoa.
-3. Registre uma despesa do negócio ou um gasto **Pessoal**; a classificação pessoal não entra no balanço do negócio nem no total anual de entradas comerciais.
-4. Consulte **Histórico** para localizar ou corrigir um lançamento e **Ano** para acompanhar o que foi informado.
-5. Se desejar, abra **Ajustes → Configurar lembrete**, escolha dia e horário e ative o aviso. Confira sempre a situação do DAS nos canais oficiais.
+3. Para registrar uma sequência, use **Salvar e adicionar outro**: valor e observação são limpos somente após salvar; tipo, âmbito, categoria e data são mantidos e o foco volta ao valor. Use o salvamento normal para voltar ou a seta de retorno para encerrar a sequência. Na edição, apenas o salvamento normal é oferecido.
+4. Registre uma despesa do negócio ou um gasto **Pessoal**. No **Início**, alterne Negócio/Pessoal/Todos para filtrar os totais e os recentes; a seleção é mantida durante a navegação nessa sessão, não após reiniciar o app. Registros pessoais não entram nos totais identificados como do negócio nem no acompanhamento anual comercial.
+5. Consulte **Histórico** para localizar ou corrigir um lançamento e **Ano** para acompanhar o que foi informado.
+6. Se desejar, abra **Ajustes → Configurar lembrete**, escolha dia e horário e ative o aviso. Confira sempre a situação do DAS nos canais oficiais.
 
 ## Uso no celular, sem cabo e sem internet
 
@@ -73,8 +74,16 @@ flutter build apk --debug
 
 O arquivo gerado fica em `build/app/outputs/flutter-apk/app-debug.apk`. Se for instalar manualmente com ADB, use `adb install -r build/app/outputs/flutter-apk/app-debug.apk` com a depuração USB autorizada no dispositivo. Antes de apresentar, abra o aplicativo no próprio telefone e confira o fluxo desejado; depois da instalação, a execução normal não depende de ADB.
 
+## Visual V5 Editorial B
+
+O novo visual está implementado em Flutter no Início, Histórico, formulário/edição, Ano, tour e Ajustes/DAS. Preserva a marca N, usa fontes locais Inter e Playfair Display e destaca **entradas em verde** e **saídas em vermelho**. No Início, a ação de novo lançamento fica no fluxo, sem botão flutuante sobre os registros. V5 é o nome da família visual; não altera a versão do produto para 5.0.
+
+Consulte o [recorte implementado, validações e limites do V5](docs/hermes/V5-IMPLEMENTACAO.md). A interface foi exercitada no emulador. Após alinhar também o ícone Android à paleta V5, a suíte integrada teve 95 testes aprovados, análise estática limpa e novo APK debug com assets conferidos. O novo visual ainda precisa de avaliação no aparelho físico.
+
 ## Estado do projeto
 
 Esta versão cobre o fluxo local de apresentação e uso manual. Exportação/backup próprios, sincronização, integrações externas e regras fiscais automáticas **não estão implementados**. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
 
 Para continuar o desenvolvimento com o Hermes Agent em outro computador, consulte [as instruções de migração para Windows](docs/hermes/IMPORTAR-WINDOWS.md) e a [síntese compartilhável de requisitos e arquitetura](docs/hermes/REQUISITOS-ARQUITETURA.md). Elas transferem apenas conhecimento revisado e não incluem respostas individuais da pesquisa, conversas ou credenciais.
+
+A [documentação de arquitetura C4](docs/arquitetura/C4-NOTAMEI.md) relaciona a implementação atual aos direcionadores acadêmicos, explicita as lacunas de IA/API e separa propostas futuras. Os [diagramas em HTML](docs/arquitetura/c4-notamei.html) podem ser abertos sem internet. Os PDFs e as respostas brutas permanecem locais em uma pasta ignorada pelo Git.
