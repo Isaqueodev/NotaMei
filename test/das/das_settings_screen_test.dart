@@ -38,6 +38,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('1').last);
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Ativar lembrete'));
     await tester.tap(find.text('Ativar lembrete'));
     await tester.pumpAndSettle();
     expect(
@@ -66,6 +67,7 @@ void main() {
         home: DasSettingsScreen(service: service, onChanged: () => changes++),
       ),
     );
+    await tester.ensureVisible(find.text('Ativar lembrete'));
     await tester.tap(find.text('Ativar lembrete'));
     await tester.pumpAndSettle();
     expect(find.text('Lembrete desativado'), findsOneWidget);

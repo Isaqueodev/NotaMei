@@ -57,9 +57,11 @@ void main() {
     expect(find.text('Registre o que entra e sai'), findsOneWidget);
     expect(find.text('Pular tour'), findsNWidgets(2));
 
+    await tester.ensureVisible(find.text('Próximo'));
     await tester.tap(find.text('Próximo'));
     await tester.pumpAndSettle();
     expect(find.text('Separe negócio e pessoal'), findsOneWidget);
+    await tester.ensureVisible(find.text('Próximo'));
     await tester.tap(find.text('Próximo'));
     await tester.pumpAndSettle();
     expect(find.text('Acompanhe seus avisos'), findsOneWidget);
@@ -70,6 +72,7 @@ void main() {
     expect(find.text('Pronto para começar'), findsOneWidget);
     expect(finished, 0);
 
+    await tester.ensureVisible(find.text('Ir para o Início'));
     await tester.tap(find.text('Ir para o Início'));
     expect(finished, 1);
   });
@@ -92,14 +95,18 @@ void main() {
     await tester.ensureVisible(find.text('Ver como funciona'));
     await tester.tap(find.text('Ver como funciona'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Próximo'));
     await tester.tap(find.text('Próximo'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Próximo'));
     await tester.tap(find.text('Próximo'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Começar a usar'));
     await tester.tap(find.text('Começar a usar'));
     await tester.pumpAndSettle();
 
     expect(find.text('Pronto para começar'), findsOneWidget);
+    await tester.ensureVisible(find.text('Adicionar primeiro lançamento'));
     await tester.tap(find.text('Adicionar primeiro lançamento'));
     expect(added, 1);
   });
@@ -143,9 +150,11 @@ void main() {
       _host(onFinish: () {}, onAddFirstEntry: () {}, showWelcome: false),
     );
 
+    await tester.ensureVisible(find.text('Próximo'));
     await tester.tap(find.text('Próximo'));
     await tester.pumpAndSettle();
     expect(find.text('Separe negócio e pessoal'), findsOneWidget);
+    await tester.ensureVisible(find.text('Voltar'));
     await tester.tap(find.text('Voltar'));
     await tester.pumpAndSettle();
     expect(find.text('Registre o que entra e sai'), findsOneWidget);

@@ -3,27 +3,26 @@ import 'package:flutter/material.dart';
 import '../core/money.dart';
 import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
-import 'utils.dart';
+import '../theme/notamei_theme.dart';
+import 'editorial_widgets.dart';
 
 class DashboardScreen extends StatefulWidget {
   final EntryRepository repository;
   final VoidCallback onAdd;
   final VoidCallback onHistory;
-
   const DashboardScreen({
     super.key,
     required this.repository,
     required this.onAdd,
     required this.onHistory,
   });
-
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
   DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
-
+  EntryScope? _scope = EntryScope.business;
   @override
   void initState() {
     super.initState();
@@ -49,416 +48,295 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (mounted) setState(() {});
   }
 
-  void _prevMonth() {
-    setState(() {
-      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
-    });
-  }
-
-  void _nextMonth() {
-    setState(() {
-      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
-    });
-  }
+  void _changeMonth(int delta) => setState(() {
+    _selectedMonth = DateTime(
+      _selectedMonth.year,
+      _selectedMonth.month + delta,
+    );
+  });
 
   @override
   Widget build(BuildContext context) {
-    final summary = widget.repository.summaryFor(_selectedMonth);
-    final monthEntries = widget.repository.forMonth(_selectedMonth);
-    // Sort recent entries by date descending, limit to 5
+    final monthEntries = widget.repository
+        .forMonth(_selectedMonth)
+        .where((entry) => _scope == null || entry.scope == _scope)
+        .toList();
+    var income = 0;
+    var expense = 0;
+    var totalsOverflow = false;
+    try {
+      for (final entry in monthEntries) {
+        if (entry.type == EntryType.income) {
+          income = checkedAddCents(income, entry.amountCents);
+        } else {
+          expense = checkedAddCents(expense, entry.amountCents);
+        }
+      }
+    } on RangeError {
+      // Never display a wrapped or partial sum as a financial result.
+      totalsOverflow = true;
+    }
+    final summary = MonthSummary(incomeCents: income, expenseCents: expense);
+    final summaryTitle = switch (_scope) {
+      EntryScope.business => 'Balanço do Negócio (Mês)',
+      EntryScope.personal => 'Balanço Pessoal (Mês)',
+      null => 'Balanço geral (Mês)',
+    };
     final recentEntries = List<EntryRecord>.from(monthEntries)
       ..sort((a, b) => b.date.compareTo(a.date));
     final displayEntries = recentEntries.take(5).toList();
-
-    final isEmpty = monthEntries.isEmpty;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'NotaMei',
-          style: TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-      ),
+      backgroundColor: NotaMeiTheme.paper,
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
           children: [
-            // Month selector header
+            Row(
+              children: [
+                Image.asset(
+                  'assets/brand/notamei.png',
+                  width: 32,
+                  height: 32,
+                  excludeFromSemantics: true,
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'NotaMei',
+                  style: TextStyle(
+                    color: NotaMeiTheme.ink,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            EditorialMonthSelector(
+              month: _selectedMonth,
+              onPrevious: () => _changeMonth(-1),
+              onNext: () => _changeMonth(1),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final option in <(String, EntryScope?)>[
+                  ('Negócio', EntryScope.business),
+                  ('Pessoal', EntryScope.personal),
+                  ('Todos', null),
+                ])
+                  ChoiceChip(
+                    label: Text(option.$1),
+                    selected: _scope == option.$2,
+                    selectedColor: NotaMeiTheme.ink,
+                    checkmarkColor: Colors.white,
+                    labelStyle: editorialChipLabel(_scope == option.$2),
+                    onSelected: (_) => setState(() => _scope = option.$2),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              key: const Key('monthly-summary'),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: NotaMeiTheme.ink,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.chevron_left,
-                      color: Color(0xFF334155),
-                    ),
-                    onPressed: _prevMonth,
-                    tooltip: 'Mês anterior',
-                  ),
                   Text(
-                    formatMonthYear(_selectedMonth),
+                    summaryTitle,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    totalsOverflow ? '—' : formatMoney(summary.balanceCents),
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF0F172A),
+                      fontFamily: 'Playfair Display',
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFF334155),
+                  if (_scope == null) ...[
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Negócio + Pessoal. Total geral dos registros informados.',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
-                    onPressed: _nextMonth,
-                    tooltip: 'Próximo mês',
+                  ],
+                  const SizedBox(height: 20),
+                  const Divider(color: NotaMeiTheme.muted),
+                  const SizedBox(height: 16),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final items = [
+                        _summaryItem(
+                          'Entradas',
+                          totalsOverflow ? '—' : formatMoney(income),
+                          Icons.add,
+                          NotaMeiTheme.incomeDark,
+                        ),
+                        _summaryItem(
+                          'Saídas',
+                          totalsOverflow ? '—' : formatMoney(expense),
+                          Icons.remove,
+                          NotaMeiTheme.expenseDark,
+                        ),
+                      ];
+                      if (constraints.maxWidth /
+                              MediaQuery.textScalerOf(context).scale(1) <
+                          300) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            items[0],
+                            const SizedBox(height: 16),
+                            items[1],
+                          ],
+                        );
+                      }
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: items[0]),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 12),
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(color: NotaMeiTheme.muted),
+                                ),
+                              ),
+                              child: items[1],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
-            Expanded(
-              child: ListView(
+            if (totalsOverflow)
+              const Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: Text(
+                  'Os totais deste filtro excedem o intervalo suportado.',
+                ),
+              ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: widget.onAdd,
+              icon: const Icon(Icons.add),
+              label: const Text('Novo Lançamento'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: NotaMeiTheme.ink,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                minimumSize: const Size.fromHeight(48),
                 padding: const EdgeInsets.all(16),
-                children: [
-                  // Business Summary Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6C31C7), Color(0xFF6C31C7)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF6C31C7).withValues(alpha: 0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              children: [
+                Text(
+                  'Lançamentos Recentes',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                TextButton(
+                  onPressed: widget.onHistory,
+                  child: const Text('Ver todos'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            LedgerSheet(
+              key: const Key('recent-ledger'),
+              children: [
+                if (displayEntries.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(24),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Balanço do Negócio (Mês)',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                'MEI',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
+                        const Icon(
+                          Icons.edit_note,
+                          color: NotaMeiTheme.muted,
+                          size: 32,
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          formatMoney(summary.balanceCents),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
+                        const Text(
+                          'Nenhum lançamento neste mês',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _summaryItem(
-                                'Entradas',
-                                formatMoney(summary.incomeCents),
-                                Icons.arrow_downward,
-                                const Color(0xFF4ADE80),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _summaryItem(
-                                'Saídas',
-                                formatMoney(summary.expenseCents),
-                                Icons.arrow_upward,
-                                const Color(0xFFF87171),
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 8),
+                        Text(
+                          _scope == EntryScope.personal
+                              ? 'Nenhum lançamento pessoal neste mês. Você pode registrar uma entrada ou saída pessoal.'
+                              : 'Use Novo Lançamento acima para registrar uma entrada ou saída${_scope == EntryScope.business ? ' do negócio' : ''}.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: NotaMeiTheme.muted,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // Recent Entries Section Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Lançamentos Recentes',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                      if (!isEmpty)
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF6C31C7),
-                          ),
-                          onPressed: widget.onHistory,
-                          child: const Text('Ver todos'),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Empty State or List
-                  if (isEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 40,
-                        horizontal: 24,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF3ECFA),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.account_balance_wallet_outlined,
-                              size: 40,
-                              color: Color(0xFF6C31C7),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Nenhum lançamento neste mês',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Toque no botão abaixo para adicionar sua primeira receita ou despesa do negócio.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF64748B),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            onPressed: widget.onAdd,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Novo Lançamento'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6C31C7),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else
-                    ...displayEntries.map((entry) => _entryCard(entry)),
-                ],
-              ),
+                for (final entry in displayEntries) LedgerEntry(entry: entry),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Registros manuais e locais. Balanço = entradas menos saídas registradas.',
+              style: TextStyle(color: NotaMeiTheme.muted, fontSize: 14),
             ),
           ],
         ),
       ),
-      floatingActionButton: isEmpty
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: widget.onAdd,
-              backgroundColor: const Color(0xFF6C31C7),
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add),
-              label: const Text('Novo Lançamento'),
-            ),
     );
   }
 
-  Widget _summaryItem(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
+  Widget _summaryItem(String label, String value, IconData icon, Color color) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 16),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          Row(
+            children: [
+              Icon(icon, size: 18, color: color),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
                   label,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  style: TextStyle(color: color, fontSize: 14),
                 ),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _entryCard(EntryRecord entry) {
-    final isIncome = entry.type == EntryType.income;
-    final isPersonal = entry.scope == EntryScope.personal;
-    final color = isIncome ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-              color: color,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        entry.category,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                    ),
-                    if (isPersonal)
-                      Container(
-                        margin: const EdgeInsets.only(left: 6),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          'Pessoal',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFD97706),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${formatShortDate(entry.date)}${entry.note != null && entry.note!.isNotEmpty ? ' • ${entry.note}' : ''}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF64748B),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
+          const SizedBox(height: 8),
           Text(
-            '${isIncome ? '+' : '-'} ${formatMoney(entry.amountCents)}',
+            value,
             style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
               color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
-      ),
-    );
-  }
+      );
 }
