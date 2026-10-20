@@ -1,6 +1,9 @@
 /referencias de design/
 /docs/analise-requisitos-arquitetura.md
 
+# Private contextual documents and individual survey responses (local only)
+/docs/documentação_contextualizar/
+
 # Local agent state, credentials and transfer archives (never publish)
 /.hermes/
 /.env
