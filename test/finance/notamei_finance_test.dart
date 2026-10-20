@@ -377,6 +377,9 @@ void main() {
     expect(repository.entries.single.amountCents, 123456);
     expect(repository.summaryFor(DateTime.now()).incomeCents, 0);
     expect(find.text('R\$ 0,00'), findsNWidgets(3));
+    expect(find.text('+ R\$ 1.234,56'), findsNothing);
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Pessoal'));
+    await tester.pumpAndSettle();
     expect(find.text('+ R\$ 1.234,56'), findsOneWidget);
   });
 
@@ -403,7 +406,7 @@ void main() {
     });
 
     financeWidgetTest(
-      'dashboard totaliza só o negócio mesmo listando o pessoal',
+      'dashboard filtra negócio por padrão e permite consultar pessoal',
       (tester) async {
         await tester.runAsync(() async {
           await repository.upsert(
@@ -430,8 +433,13 @@ void main() {
         await pumpFlow(tester);
 
         expect(find.text('R\$ 70,00'), findsOneWidget); // balanço do negócio
-        expect(find.text('Pessoal'), findsOneWidget); // selo no cartão pessoal
+        expect(find.widgetWithText(ChoiceChip, 'Pessoal'), findsOneWidget);
+        expect(find.text('Salário'), findsNothing);
+        await tester.tap(find.widgetWithText(ChoiceChip, 'Pessoal'));
+        await tester.pumpAndSettle();
         expect(find.text('Salário'), findsOneWidget);
+        expect(find.text('Balanço Pessoal (Mês)'), findsOneWidget);
+        expect(repository.summaryFor(DateTime.now()).balanceCents, 7000);
       },
     );
   });
@@ -605,6 +613,16 @@ void main() {
       await tester.tap(find.widgetWithText(FilterChip, 'Todos'));
       await tester.pump();
       expect(find.text('Vendas'), findsOneWidget);
+      // Âmbito e tipo são independentes: Todos não apaga Entradas.
+      expect(find.text('Alimentação'), findsNothing);
+      expect(
+        tester
+            .widget<FilterChip>(find.widgetWithText(FilterChip, 'Entradas'))
+            .selected,
+        isTrue,
+      );
+      await tester.tap(find.widgetWithText(FilterChip, 'Entradas'));
+      await tester.pump();
       expect(find.text('Alimentação'), findsOneWidget);
 
       await tester.tap(find.byType(BackButton));

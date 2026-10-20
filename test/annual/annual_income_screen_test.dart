@@ -5,6 +5,38 @@ import 'package:notamei/data/entry_record.dart';
 
 void main() {
   testWidgets(
+    'Editorial anual inclui os doze meses e legenda sem comprovar inatividade',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(2)),
+            child: child!,
+          ),
+          home: AnnualIncomeScreen(
+            entries: const [],
+            year: DateTime.now().year + 1,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.text('—: sem entrada informada; movimento não confirmado'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('histórico parcial'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Dezembro'), 300);
+      expect(find.text('Dezembro').hitTestable(), findsOneWidget);
+      expect(find.text('Sem movimento'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
     'apresenta apenas entradas informadas sem concluir situação fiscal',
     (tester) async {
       final records = [
@@ -33,7 +65,7 @@ void main() {
       expect(find.text('R\$ 900,00'), findsNothing);
       expect(find.textContaining('histórico parcial'), findsOneWidget);
       expect(find.textContaining('não é uma apuração fiscal'), findsOneWidget);
-      expect(find.textContaining('Sem entrada informada'), findsWidgets);
+      expect(find.textContaining('sem entrada informada'), findsWidgets);
     },
   );
 

@@ -50,8 +50,12 @@ void main() {
       find.textContaining('cópias do sistema dependem das suas configurações'),
       findsOneWidget,
     );
-    expect(find.textContaining('não confirma pagamento'), findsOneWidget);
     expect(find.text('Rever tour'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.textContaining('não confirma pagamento'),
+      200,
+    );
+    expect(find.textContaining('não confirma pagamento'), findsOneWidget);
     expect(find.textContaining('DAS'), findsWidgets);
   });
 
