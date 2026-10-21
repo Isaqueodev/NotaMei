@@ -7,6 +7,7 @@ import '../das/das_reminder_service.dart';
 import '../das/das_settings_screen.dart';
 import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
+import '../export/export_screen.dart';
 import '../finance/dashboard_screen.dart';
 import '../finance/entry_form_screen.dart';
 import '../finance/entry_history_screen.dart';
@@ -79,6 +80,14 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
     );
   }
 
+  void _openExport() {
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute<void>(
+        builder: (_) => ExportScreen(repository: widget.repository),
+      ),
+    );
+  }
+
   void _openDas() {
     _navigatorKey.currentState?.push(
       MaterialPageRoute<void>(
@@ -131,6 +140,7 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
         ),
         SettingsScreen(
           onOpenTour: _reviewTour,
+          onExportCsv: _openExport,
           onConfigureDas: _openDas,
           dasEnabled: widget.dasService.enabled,
           reminderWarning: widget.reminderWarning,
