@@ -234,15 +234,19 @@ class _ExportScreenState extends State<ExportScreen> {
                         'Saídas selecionadas: R\$ ${exportAmount(report.expenseCents)}',
                       ),
                       Text(
+                        'Transferências enviadas: R\$ ${exportAmount(report.sentCents)}',
+                      ),
+                      Text(
+                        'Transferências recebidas: R\$ ${exportAmount(report.receivedCents)}',
+                      ),
+                      Text(
                         'Balanço selecionado: R\$ ${exportAmount(report.balanceCents)}',
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Balanço = entradas menos saídas selecionadas; não é saldo bancário ou lucro. Em Todos, os valores somam Negócio + Pessoal. Com filtro de tipo, o resumo considera somente esse tipo.',
-                ),
+                Text(report.summaryExplanation),
                 if (report.entries.isEmpty) ...[
                   const SizedBox(height: 12),
                   const Text(

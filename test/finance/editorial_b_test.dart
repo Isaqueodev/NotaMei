@@ -81,7 +81,7 @@ void main() {
           expect(find.text('Novo Lançamento').hitTestable(), findsOneWidget);
           await tester.scrollUntilVisible(
             find.text(
-              'Registros manuais e locais. Balanço = entradas menos saídas registradas.',
+              'Registros manuais e locais. Balanço considera entradas e saídas comuns e, por âmbito, retiradas enviadas/recebidas. Em Todos, movimentações internas são excluídas.',
             ),
             300,
           );

@@ -12,7 +12,8 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 | --- | --- |
 | Primeiro uso | Escolher entre um tour opcional e começar direto; rever o tour em **Ajustes**. |
 | Lançamentos | Registrar **entrada** ou **saída**, valor em reais, data, categoria e observação opcional; classificar manualmente como **Negócio** ou **Pessoal**. Usar **Salvar e adicionar outro** para continuar no formulário, ou o salvamento normal para voltar. Editar e excluir registros. |
-| Início | Consultar entradas, saídas, balanço e lançamentos recentes no mês selecionado, filtrando **Negócio**, **Pessoal** ou **Todos**. O padrão é Negócio; Todos identifica explicitamente a soma geral dos dois âmbitos. O balanço é entradas menos saídas registradas, não o saldo de uma conta bancária. |
+| Início | Consultar entradas, saídas, balanço e lançamentos recentes no mês selecionado, filtrando **Negócio**, **Pessoal** ou **Todos**. O padrão é Negócio; Todos identifica explicitamente a soma geral dos dois âmbitos. O balanço considera também retiradas enviadas/recebidas por âmbito, sem duplicar internas em Todos; não é saldo bancário. |
+| Pagar-me | Registrar uma **Retirada do titular**: saída do Negócio e entrada no Pessoal vinculadas, com edição/exclusão conjunta. Não duplica entradas/saídas gerais nem receita anual. É registro manual, sem transferência real ou classificação fiscal automática. |
 | Histórico | Navegar por mês e filtrar os registros por Negócio/Pessoal e Entrada/Saída. |
 | Ano | Ver a soma por mês e o total das **entradas do negócio informadas** no ano corrente. Meses sem registro não são tratados como meses sem movimento. |
 | Ajustes | Ativar ou desativar um lembrete local relacionado ao DAS, escolhendo dia do mês e horário. Rever o tour. Exportar relatório CSV por período e filtros, para salvar localmente ou compartilhar. |
@@ -26,6 +27,14 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 5. Consulte **Histórico** para localizar ou corrigir um lançamento e **Ano** para acompanhar o que foi informado.
 6. Em **Ajustes → Exportar CSV**, escolha data de referência, período (dia/semana/mês/ano), âmbitos, tipos e se inclui observações; visualize a prévia e use **Salvar CSV** (seletor de arquivos local) ou **Compartilhar CSV** (Share Sheet nativo). O CSV não é backup restaurável nem documento fiscal.
 7. Se desejar, abra **Ajustes → Configurar lembrete**, escolha dia e horário e ative o aviso. Confira sempre a situação do DAS nos canais oficiais.
+
+## Retirada do titular (FB08)
+
+No **Início → Pagar-me**, informe valor positivo em pt-BR, data e observação opcional. O app registra as duas pontas da movimentação **Negócio → Pessoal** em uma transação. Toque numa ponta no Histórico ou nos recentes para editar/excluir o par; a confirmação explica que ambas são afetadas. Não use um lançamento comum para registrar novamente a outra ponta.
+
+Entradas/Saídas mostram apenas movimentos comuns. **Retiradas para você** e **Recebido do negócio** explicam o efeito por âmbito; em **Todos**, internas não afetam entradas, saídas nem balanço, inclusive no CSV com filtro de tipo. O anual continua somando apenas entradas comerciais externas. O app permite registrar retirada com balanço negativo: histórico parcial não informa capacidade de pagamento. Não calcula encargos, folha, lucro distribuível ou classificação automática de pró-labore/lucros.
+
+O SQLite passa de esquema 1 para **2** por migração aditiva, sem inferir vínculos de registros antigos. Preferências não são alteradas. Voltar o código para `rollback/pre-retiradas-9619b3a` **não** restaura dados e não autoriza instalar um APK de esquema 1 sobre a base migrada. Não existe downgrade de dados implementado. Consulte [modelagem, cálculos, testes e reversibilidade](docs/hermes/RETIRADA-TITULAR.md).
 
 ## Uso no celular, sem cabo e sem internet
 

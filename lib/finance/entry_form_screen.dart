@@ -5,6 +5,7 @@ import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
 import '../theme/notamei_theme.dart';
 import 'utils.dart';
+import 'withdrawal_form_screen.dart';
 
 class EntryFormScreen extends StatefulWidget {
   final EntryRepository repository;
@@ -268,6 +269,14 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.existing?.isWithdrawal ?? false) {
+      return WithdrawalFormScreen(
+        repository: widget.repository,
+        existing: widget.existing,
+        onSaved: widget.onSaved,
+        onDeleted: widget.onDeleted,
+      );
+    }
     final isEditing = widget.existing != null;
     final typeColor = _type == EntryType.income
         ? NotaMeiTheme.income

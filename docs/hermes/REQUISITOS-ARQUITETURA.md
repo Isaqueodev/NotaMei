@@ -24,7 +24,7 @@ A primeira versão opera com lançamento **manual e local**. Não há integraç�
 | RF10 | Tour opcional de três passos, opção de começar sem tour, pular para o Início, tela de conclusão distinta e reabertura em Ajustes sem apagar dados. | **Implementado** em [`lib/onboarding/`](../../lib/onboarding/) e [`lib/app/`](../../lib/app/); fluxo exercitado no A17. |
 | RF08–09 | Relatórios detalhados, metas, comprovantes, fiado e sincronização entre dispositivos. | **Parcial:** relatório CSV por período e filtros implementado em FB04; PDF, metas, comprovantes, fiado e sincronização continuam futuros, com requisitos próprios. |
 
-**Casos ainda sem regra fechada:** retirada do negócio para uso pessoal, transferência entre contas, venda parcelada, estorno, duplicidade e lançamento anterior à instalação. Uma classificação manual não resolve automaticamente esses casos; evite contabilizar a mesma movimentação duas vezes. Antes de automatizar qualquer comparação fiscal, definir o conceito de receita, cobertura do histórico, versão das regras e revisão por fonte oficial e especialista. Nenhum valor de teto ou data legal deve ser inferido do balanço de caixa.
+**Casos ainda sem regra fechada:** transferências entre contas em geral, venda parcelada, estorno, duplicidade e lançamento anterior à instalação. A retirada do titular tem recorte manual definido e implementado em FB08 (Negócio → Pessoal, sem contagem duplicada), sem classificação fiscal automática. Uma classificação manual não resolve automaticamente os demais casos. Antes de automatizar qualquer comparação fiscal, definir o conceito de receita, cobertura do histórico, versão das regras e revisão por fonte oficial e especialista. Nenhum valor de teto ou data legal deve ser inferido do balanço de caixa.
 
 ## 3. Requisitos não funcionais e verificação
 
@@ -32,7 +32,7 @@ A primeira versão opera com lançamento **manual e local**. Não há integraç�
 | --- | --- | --- |
 | Offline | Cadastro e consulta usam SQLite no próprio aparelho; preferências e avisos são locais. | Repetir testes em modo avião e em outros Androids; internet pode ser necessária apenas para obter o APK ou outras tarefas fora do app. |
 | Dinheiro e datas | Valores são centavos inteiros; somas têm validação de limite; datas de registros são exibidas em pt-BR e filtradas por mês/ano. | Testar cenários de data, mudança de ano e atualização de versão no aparelho. |
-| Integridade | Operações de gravação precedem atualização visível; bloqueio de duplo toque no salvamento e tratamento de erro permitem nova tentativa. SQLite usa esquema versão 1. | Planejar migrações futuras e testar interrupção/atualização sem perda. |
+| Integridade | Operações de gravação precedem atualização visível; bloqueio de duplo toque no salvamento e tratamento de erro permitem nova tentativa. SQLite usa esquema versão 2: coluna nullable `withdrawal_id`, com migração aditiva real de v1 e operações de retirada em transação (duas pontas e releitura antes do commit). | Validar atualização no aparelho; não existe downgrade de dados implementado. |
 | Privacidade | O app não oferece sincronização própria; registros ficam localmente. O sistema operacional pode ter política de backup própria. | Documentar e testar política de cópia/recuperação antes de depender de dados reais; avaliar riscos em aparelho perdido ou compartilhado. |
 | Acessibilidade | Textos de erro e rótulos são necessários para uso sem depender só da cor; tour e navegação devem continuar utilizáveis sem animações. | Medir legibilidade, foco, áreas de toque e preferência por redução de movimento em testes observados. |
 | Avisos | Alarmes locais dependem de permissão, sistema e economia de bateria. Dia 29–31 ajusta ao último dia em mês curto; agenda móvel de até 12 lembretes se renova ao abrir o app. | Observar a entrega real, reinício do aparelho, fuso horário e alterações de permissão; nunca prometer pontualidade. |
@@ -58,8 +58,8 @@ flowchart LR
 ```
 
 - [`lib/main.dart`](../../lib/main.dart) inicializa preferências, repositório e serviço DAS antes de abrir [`NotaMeiApp`](../../lib/app/notamei_app.dart). Falha de atualização de notificações não deve impedir acesso aos lançamentos.
-- [`EntryRecord`](../../lib/data/entry_record.dart) tem identificador local, tipo, âmbito, valor em centavos, categoria textual, data e observação opcional. **Não** há tabela separada de categorias, UUID obrigatório nem dados históricos declarados pelo usuário nesta versão.
-- [`EntryRepository`](../../lib/data/entry_repository.dart) persiste lançamentos em SQLite e expõe consultas/somas mensais do negócio. As telas chamam o repositório diretamente; **não** existe uma camada formal separada de casos de uso nesta implementação. A soma anual filtra entradas comerciais do ano selecionado.
+- [`EntryRecord`](../../lib/data/entry_record.dart) tem identificador local, tipo, âmbito, valor em centavos, categoria textual, data, observação opcional e `withdrawalId` nullable. O vínculo é explícito; textos antigos não são reinterpretados. Não há tabela separada de categorias ou dados históricos declarados.
+- [`EntryRepository`](../../lib/data/entry_repository.dart) persiste lançamentos e retiradas vinculadas em SQLite. As telas chamam o repositório diretamente; não existe uma camada formal separada de casos de uso. [`EntryTotals`](../../lib/data/entry_totals.dart) centraliza totais de painel, resumo do repositório e CSV com `BigInt`; painel/repositório checam o intervalo ao converter. A soma anual exclui internas e filtra entradas comerciais externas do ano selecionado.
 - [`DasReminderService`](../../lib/das/das_reminder_service.dart) guarda preferências e usa um gateway de notificações; a ponte Android em [`local_das_gateway.dart`](../../lib/das/local_das_gateway.dart) agenda/cancela identificadores próprios. Uma falha parcial deve desativar a preferência e tentar cancelar alarmes próprios.
 - Não existe servidor, API, PostgreSQL, autenticação nem sincronização na arquitetura atual. São opções **futuras**, dependentes de decisão de produto, proteção de dados, resolução de conflitos e testes; não pré-requisitos para o MVP offline.
 - [`lib/export/`](../../lib/export/) separa seleção/prévia (`ExportScreen`), geração determinística (`CsvReport`) e saída nativa (`ExportGateway`). A tela lê o snapshot e fornece o relatório ao gateway; não há escrita no repositório nem alteração do esquema SQLite. Arquivos e apps destinatários ficam fora do controle do NotaMei. Consulte [escopo, validação e rollback do CSV](EXPORTACAO-CSV.md).
@@ -67,13 +67,13 @@ flowchart LR
 ## 5. Próximas validações e decisões
 
 1. Conduzir uso observado com consentimento e exemplos fictícios; registrar feedback agregado sobre rapidez, classificação, compreensão do balanço e recuperação de dados. Definir critérios e participantes antes de relatar impacto; não atribuir resultados ao projeto sem medição.
-2. Definir o tratamento de retirada/transferência, histórico anterior e eventuais alertas anuais com revisão de domínio. Enquanto isso, manter o acompanhamento descritivo, sem conclusão fiscal.
+2. Validar em uso o recorte manual de retirada FB08; transferências genéricas, histórico anterior e eventuais alertas anuais continuam exigindo decisões próprias. Manter acompanhamento descritivo, sem conclusão fiscal.
 3. Planejar backup/restauração e migração de banco antes de uso prolongado. A exportação CSV disponível não permite restaurar o banco; a desinstalação/limpeza de dados pode remover registros locais.
 4. Validar acessibilidade, funcionamento em modo avião e entrega de lembretes em datas reais. Preparar assinatura e atualização de APKs de teste antes de ampliar a distribuição.
 
 ## 6. Feedbacks para evolução — implementação e pendências
 
-**Origem e estado:** demandas relatadas pelo responsável após feedback de uso, sem relatos individuais ou comprovação de representatividade. FB01 e FB02 foram implementados na evolução anterior; FB04 foi autorizado pelo responsável e implementado nesta evolução CSV. A validação física da nova versão permanece pendente. FB03, FB05 e FB06 continuam propostas a refinar; FB07 só deve ser avaliado após o lançamento. FB08 registra o feedback sobre pró-labore/remuneração da pessoa MEI, reservado para análise futura. Os identificadores FB01–FB08 preservam o rastreio sem renumerar requisitos.
+**Origem e estado:** demandas relatadas pelo responsável após feedback de uso, sem relatos individuais ou comprovação de representatividade. FB01 e FB02 foram implementados na evolução anterior; FB04 foi autorizado pelo responsável e implementado nesta evolução CSV. A validação física da nova versão permanece pendente. FB03, FB05 e FB06 continuam propostas a refinar; FB07 só deve ser avaliado após o lançamento. FB08 foi autorizado em recorte de retirada manual vinculada, sem apuração fiscal, e está implementado nesta evolução. Os identificadores FB01–FB08 preservam o rastreio sem renumerar requisitos.
 
 | ID | Feedback / evolução solicitada | Estado e relação com o MVP |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ flowchart LR
 | FB05 | Exportar dados por dia, semana, mês ou ano em PDF. | **Proposta futura.** Compartilha as regras de seleção de FB04, com apresentação própria para leitura/impressão; não há geração de PDF implementada. |
 | FB06 | Integrar uma IA local simples para ajudar a pessoa MEI, com evolução para uso online e offline. | **Proposta futura, dependente de prova de conceito e escopo.** O app atual não contém IA nem serviços online próprios. IA local não exige, por si só, processamento em nuvem. |
 | FB07 | Disponibilizar uma versão Lite. | **Somente após o lançamento do app**, conforme orientação do responsável. Não há escopo, data ou divisão de versões definidos. |
-| FB08 | Verificar o tratamento de pró-labore/remuneração quando a pessoa MEI quiser se pagar. | **Anotado para análise futura, sem implementação autorizada.** Definir o fluxo de retirada do negócio para uso pessoal, a classificação e o efeito nos resumos, evitando contagem duplicada. Regras contábeis/fiscais e critérios de aceitação permanecem em aberto. |
+| FB08 | Permitir à pessoa MEI registrar uma retirada para si. | **Implementado no recorte autorizado:** Início → Pagar-me / Retirada do titular. Duas pontas vinculadas (saída Negócio + entrada Pessoal), transacionais e editadas/excluídas juntas; sem inflar totais gerais ou anual. Sem transferência real, encargos ou classificação fiscal de pró-labore/lucros. Rastreio: [RETIRADA-TITULAR.md](RETIRADA-TITULAR.md). |
 
 ### 6.1. Lançamentos em sequência (FB01)
 
@@ -138,11 +138,13 @@ flowchart LR
 - **Limites atuais:** nenhum dispositivo conectado; salvar/compartilhar nativos não foram exercitados em aparelho nesta sessão. Testes unitários verificam geração e seleção com dados sintéticos; testes de widget verificam prévia, filtros, falhas, cancelamento, vazio, ação duplicada e 390 px com texto 2x. Isso não certifica usabilidade universal nem entrega futura de notificações.
 - **Reproduzir:** `flutter analyze`, `flutter test` e `flutter build apk --debug`. Consulte [exportação CSV](EXPORTACAO-CSV.md) para formato, privacidade e rollback.
 
-### 6.8. Pró-labore e remuneração da pessoa MEI (FB08)
+### 6.8. Retirada do titular — Pagar-me (FB08)
 
-- **Feedback registrado:** verificar como o NotaMei deve atender a pessoa MEI que deseja se pagar, referido pelo responsável como questão do pró-labore.
-- **Estado:** apenas uma anotação de backlog para analisar com mais calma; não define regra de negócio, prioridade, prazo ou autorização para implementar.
-- **Questões para a análise futura:** como registrar a retirada do negócio para o âmbito pessoal; quais rótulos/classificações usar; como refletir a operação nos resumos e relatórios sem duplicar movimentações. Não pressupor que retirada, transferência e pró-labore sejam conceitos equivalentes.
-- **Limite:** eventual tratamento contábil/fiscal exige definição e validação próprias nessa análise futura. Nenhum cálculo, obrigação ou classificação fiscal foi estabelecido por esta anotação.
+- **Decisão autorizada:** retirada vinculada, saída do Negócio e entrada no Pessoal, mesmo valor/data/nota e ID estável da operação. Novo formulário nativo V5 no fluxo do Início, sem quinto destino ou FAB.
+- **Integridade:** esquema SQLite 2 com `withdrawal_id` nullable, migrado de v1 sem inferir ou reclassificar dados antigos. Criação/edição/exclusão e releitura em transação; falha da segunda ponta ou da releitura reverte o banco. Publicar snapshot/notificar somente depois do commit. IDs são conservados nas edições e retries; colisões com registros comuns são recusadas sem `REPLACE`. API comum não altera ponta; remover uma ponta remove o par na mesma fila, sem reentrância.
+- **Resumos:** entradas/saídas comuns excluem internas; linhas próprias explicam retirada enviada/recebida. Todos exclui internas de entradas, saídas e balanço, mesmo com um único tipo. Anual comercial não inclui retirada. CSV e prévia usam o mesmo cálculo exato, exportam natureza/vínculo e separam totais de transferências.
+- **UX:** valor positivo pt-BR, data, observação opcional, cancelamento e confirmações que citam as DUAS pontas. Campos, botões e retorno ficam bloqueados durante gravação/exclusão; falha mantém o rascunho e o ID para retry. Filtros de âmbito/tipo no Histórico permanecem independentes e selecionam a ponta, sem impedir edição conjunta.
+- **Limites:** registro manual, não transferência real ou apuração automática de pró-labore/lucros. Não calcula folha, encargos, recorrência, limites legais, saldo disponível ou lucro distribuível. Aceita balanço negativo e histórico parcial sem inferir capacidade de pagamento.
+- **Validação e reversibilidade:** [RETIRADA-TITULAR.md](RETIRADA-TITULAR.md) registra testes e limites. O retorno de código preservado não é backup de dados. APK de esquema 1 não deve ser usado com base migrada sem estratégia de dados específica; downgrade automático não implementado. Nenhum aparelho físico foi operado nesta evolução.
 
 **Origem e proteção:** síntese de planejamento e levantamento exploratório interno, confrontada com arquivos versionados do MVP, acrescida dos feedbacks de evolução relatados pelo responsável pelo projeto. Evidências individuais e a análise detalhada original permanecem **locais e ignoradas pelo Git**; este resumo e a [documentação de arquitetura C4](../arquitetura/C4-NOTAMEI.md) são sínteses revisadas destinadas a compartilhamento remoto, sem os anexos nem respostas individuais.
