@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqflite.dart' as sqlite;
 
-import '../core/money.dart';
+import '../annual/annual_summary.dart';
 import 'entry_record.dart';
+import 'entry_totals.dart';
 
 /// Local SQLite storage. Await initialize before reading the initial snapshot.
 /// Mutations are serialized and listeners see only successfully persisted data.
@@ -34,7 +35,14 @@ class EntryRepository extends ChangeNotifier {
     final db = await _factory.openDatabase(
       path,
       options: OpenDatabaseOptions(
-        version: 1,
+        version: 2,
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2) {
+            await db.execute(
+              'ALTER TABLE entries ADD COLUMN withdrawal_id TEXT',
+            );
+          }
+        },
         onCreate: (db, version) async {
           await db.execute('''
             CREATE TABLE entries (
@@ -44,7 +52,8 @@ class EntryRepository extends ChangeNotifier {
               amount_cents INTEGER NOT NULL CHECK(amount_cents > 0),
               category TEXT NOT NULL CHECK(length(trim(category)) > 0),
               date TEXT NOT NULL,
-              note TEXT
+              note TEXT,
+              withdrawal_id TEXT
             )
           ''');
         },
@@ -60,8 +69,12 @@ class EntryRepository extends ChangeNotifier {
   }
 
   Future<void> _refresh(Database db) async {
+    _entries = await _read(db);
+  }
+
+  Future<List<EntryRecord>> _read(DatabaseExecutor db) async {
     final rows = await db.query('entries', orderBy: 'date DESC, id ASC');
-    _entries = List.unmodifiable(
+    return List.unmodifiable(
       rows.map(
         (row) => EntryRecord(
           id: row['id'] as String,
@@ -71,6 +84,7 @@ class EntryRepository extends ChangeNotifier {
           category: row['category'] as String,
           date: DateTime.parse(row['date'] as String),
           note: row['note'] as String?,
+          withdrawalId: row['withdrawal_id'] as String?,
         ),
       ),
     );
@@ -82,51 +96,126 @@ class EntryRepository extends ChangeNotifier {
     return operation;
   }
 
-  Future<void> upsert(EntryRecord entry) => _enqueue(() async {
+  Future<void> saveWithdrawal({
+    required String operationId,
+    required int amountCents,
+    required DateTime date,
+    String? note,
+  }) => _enqueue(() async {
     await initialize();
-    if (entry.scope == EntryScope.business) {
-      var monthCents = entry.amountCents;
-      var yearIncomeCents = entry.amountCents;
-      for (final current in _entries) {
-        if (current.id == entry.id ||
-            current.scope != EntryScope.business ||
-            current.type != entry.type ||
-            current.date.year != entry.date.year) {
-          continue;
-        }
-        if (current.date.month == entry.date.month) {
-          monthCents = checkedAddCents(monthCents, current.amountCents);
-        }
-        if (entry.type == EntryType.income) {
-          yearIncomeCents = checkedAddCents(
-            yearIncomeCents,
-            current.amountCents,
-          );
+    if (operationId.trim().isEmpty || amountCents <= 0) {
+      throw ArgumentError('Retirada inválida');
+    }
+    final snapshot = await _database!.transaction((txn) async {
+      for (final scope in EntryScope.values) {
+        final id = 'withdrawal:$operationId:${scope.name}';
+        final values = <String, Object?>{
+          'id': id,
+          'withdrawal_id': operationId,
+          'type': scope == EntryScope.business ? 'expense' : 'income',
+          'scope': scope.name,
+          'amount_cents': amountCents,
+          'category': 'Retirada do titular',
+          'date': date.toIso8601String(),
+          'note': note,
+        };
+        final previous = await txn.query(
+          'entries',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        if (previous.isEmpty) {
+          await txn.insert('entries', values);
+        } else {
+          if (previous.single['withdrawal_id'] != operationId) {
+            throw StateError('Colisão de identificador');
+          }
+          await txn.update('entries', values, where: 'id = ?', whereArgs: [id]);
         }
       }
+      final snapshot = await _read(txn);
+      _validateFor(snapshot, date);
+      return snapshot;
+    });
+    _entries = snapshot;
+    notifyListeners();
+  });
+
+  void _validateFor(
+    List<EntryRecord> entries,
+    DateTime date, {
+    bool allScopes = true,
+  }) {
+    final month = entries.where(
+      (e) => e.date.year == date.year && e.date.month == date.month,
+    );
+    for (final scope
+        in allScopes
+            ? <EntryScope?>[null, ...EntryScope.values]
+            : <EntryScope?>[EntryScope.business]) {
+      EntryTotals.calculate(month, scope: scope).checkedSummary();
     }
-    await _database!.insert('entries', {
-      'id': entry.id,
-      'type': entry.type.name,
-      'scope': entry.scope.name,
-      'amount_cents': entry.amountCents,
-      'category': entry.category,
-      'date': entry.date.toIso8601String(),
-      'note': entry.note,
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
-    await _refresh(_database!);
+    recordedAnnualIncome(entries, date.year);
+  }
+
+  Future<void> upsert(EntryRecord entry) => _enqueue(() async {
+    await initialize();
+    if (entry.isWithdrawal) throw StateError('Use o formulário de retirada');
+    final snapshot = await _database!.transaction((txn) async {
+      final previous = await txn.query(
+        'entries',
+        where: 'id = ?',
+        whereArgs: [entry.id],
+      );
+      if (previous.isNotEmpty && previous.single['withdrawal_id'] != null) {
+        throw StateError(
+          'Use o formulário de retirada para alterar as duas pontas',
+        );
+      }
+      final values = <String, Object?>{
+        'id': entry.id,
+        'type': entry.type.name,
+        'scope': entry.scope.name,
+        'amount_cents': entry.amountCents,
+        'category': entry.category,
+        'date': entry.date.toIso8601String(),
+        'note': entry.note,
+      };
+      if (previous.isEmpty) {
+        await txn.insert('entries', values);
+      } else {
+        await txn.update(
+          'entries',
+          values,
+          where: 'id = ?',
+          whereArgs: [entry.id],
+        );
+      }
+      final snapshot = await _read(txn);
+      if (entry.scope == EntryScope.business) {
+        _validateFor(snapshot, entry.date, allScopes: false);
+      }
+      return snapshot;
+    });
+    _entries = snapshot;
     notifyListeners();
   });
 
   Future<void> remove(String id) => _enqueue(() async {
     await initialize();
-    final count = await _database!.delete(
-      'entries',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    if (count > 0) {
-      await _refresh(_database!);
+    final snapshot = await _database!.transaction((txn) async {
+      final rows = await txn.query('entries', where: 'id = ?', whereArgs: [id]);
+      if (rows.isEmpty) return null;
+      final operation = rows.single['withdrawal_id'];
+      await txn.delete(
+        'entries',
+        where: operation == null ? 'id = ?' : 'withdrawal_id = ?',
+        whereArgs: [operation ?? id],
+      );
+      return _read(txn);
+    });
+    if (snapshot != null) {
+      _entries = snapshot;
       notifyListeners();
     }
   });
@@ -139,20 +228,10 @@ class EntryRepository extends ChangeNotifier {
     ),
   );
 
-  MonthSummary summaryFor(DateTime month) {
-    var income = 0;
-    var expense = 0;
-    for (final entry in forMonth(month)) {
-      if (entry.scope != EntryScope.business) continue;
-      switch (entry.type) {
-        case EntryType.income:
-          income = checkedAddCents(income, entry.amountCents);
-        case EntryType.expense:
-          expense = checkedAddCents(expense, entry.amountCents);
-      }
-    }
-    return MonthSummary(incomeCents: income, expenseCents: expense);
-  }
+  MonthSummary summaryFor(DateTime month) => EntryTotals.calculate(
+    forMonth(month),
+    scope: EntryScope.business,
+  ).checkedSummary();
 
   /// Await before disposing or deleting a database file.
   Future<void> close() => _enqueue(() async {

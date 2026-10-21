@@ -376,7 +376,10 @@ void main() {
     expect(repository.entries.single.scope, EntryScope.personal);
     expect(repository.entries.single.amountCents, 123456);
     expect(repository.summaryFor(DateTime.now()).incomeCents, 0);
-    expect(find.text('R\$ 0,00'), findsNWidgets(3));
+    expect(
+      find.text('R\$ 0,00'),
+      findsNWidgets(4),
+    ); // Inclui retiradas para você.
     expect(find.text('+ R\$ 1.234,56'), findsNothing);
     await tester.tap(find.widgetWithText(ChoiceChip, 'Pessoal'));
     await tester.pumpAndSettle();

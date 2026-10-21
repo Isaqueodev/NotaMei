@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import '../data/entry_record.dart';
+import '../data/entry_totals.dart';
 
 enum ExportPeriod { day, week, month, year }
 
@@ -69,12 +70,7 @@ String exportAmount(BigInt cents) {
 }
 
 class CsvReport {
-  CsvReport._(
-    this.selection,
-    this.entries,
-    this.incomeCents,
-    this.expenseCents,
-  );
+  CsvReport._(this.selection, this.entries, this.totals);
 
   factory CsvReport.generate(
     Iterable<EntryRecord> source,
@@ -95,23 +91,21 @@ class CsvReport {
           final comparison = exportDate(a.date).compareTo(exportDate(b.date));
           return comparison != 0 ? comparison : a.id.compareTo(b.id);
         });
-    var income = BigInt.zero;
-    var expense = BigInt.zero;
-    for (final entry in entries) {
-      if (entry.type == EntryType.income) {
-        income += BigInt.from(entry.amountCents);
-      } else {
-        expense += BigInt.from(entry.amountCents);
-      }
-    }
-    return CsvReport._(selection, List.unmodifiable(entries), income, expense);
+    return CsvReport._(
+      selection,
+      List.unmodifiable(entries),
+      EntryTotals.calculate(entries, scope: selection.scope),
+    );
   }
 
   final ExportSelection selection;
   final List<EntryRecord> entries;
-  final BigInt incomeCents;
-  final BigInt expenseCents;
-  BigInt get balanceCents => incomeCents - expenseCents;
+  final EntryTotals totals;
+  BigInt get incomeCents => totals.incomeCents;
+  BigInt get expenseCents => totals.expenseCents;
+  BigInt get receivedCents => totals.receivedCents;
+  BigInt get sentCents => totals.sentCents;
+  BigInt get balanceCents => totals.balanceCents;
   DateTime get lastDate => DateTime(
     selection.endExclusive.year,
     selection.endExclusive.month,
@@ -120,6 +114,9 @@ class CsvReport {
   String get filename =>
       'notamei_${exportDate(selection.start)}_${exportDate(lastDate)}.csv';
   Uint8List get bytes => Uint8List.fromList(utf8.encode('\uFEFF$csv'));
+
+  String get summaryExplanation =>
+      'Entradas e saídas excluem movimentações internas. Transferências enviadas/recebidas são separadas. ${selection.scope == null ? 'Todos: internas excluídas dos totais consolidados mesmo com filtro de tipo.' : 'No âmbito selecionado: balanço = entradas - saídas + recebidas - enviadas.'} Período, âmbito e tipo selecionam as linhas; não é saldo bancário, lucro ou backup.';
 
   String get csv {
     final metadata = [
@@ -141,6 +138,9 @@ class CsvReport {
         'ambito',
         'valor_brl',
         'categoria',
+        'natureza',
+        'withdrawal_id',
+        'criterio_resumo',
         if (selection.includeNotes) 'observacao',
       ],
       for (final entry in entries)
@@ -153,11 +153,16 @@ class CsvReport {
           entry.scope == EntryScope.business ? 'Negócio' : 'Pessoal',
           exportAmount(BigInt.from(entry.amountCents)),
           _safeText(entry.category),
+          entry.isWithdrawal ? 'Retirada do titular' : 'Lançamento comum',
+          _safeText(entry.withdrawalId ?? ''),
+          summaryExplanation,
           if (selection.includeNotes) _safeText(entry.note ?? ''),
         ],
       for (final total in [
         ('Entradas', incomeCents),
         ('Saídas', expenseCents),
+        ('Transferências enviadas', sentCents),
+        ('Transferências recebidas', receivedCents),
         ('Balanço dos registros selecionados', balanceCents),
       ])
         [
@@ -169,6 +174,9 @@ class CsvReport {
           selection.scopeLabel,
           exportAmount(total.$2),
           '',
+          '',
+          '',
+          summaryExplanation,
           if (selection.includeNotes) '',
         ],
     ];

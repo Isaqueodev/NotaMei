@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../core/money.dart';
 import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
+import '../data/entry_totals.dart';
+import 'withdrawal_form_screen.dart';
 import '../theme/notamei_theme.dart';
 import 'editorial_widgets.dart';
 
@@ -61,22 +63,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .forMonth(_selectedMonth)
         .where((entry) => _scope == null || entry.scope == _scope)
         .toList();
-    var income = 0;
-    var expense = 0;
+    var summary = const MonthSummary(incomeCents: 0, expenseCents: 0);
     var totalsOverflow = false;
     try {
-      for (final entry in monthEntries) {
-        if (entry.type == EntryType.income) {
-          income = checkedAddCents(income, entry.amountCents);
-        } else {
-          expense = checkedAddCents(expense, entry.amountCents);
-        }
-      }
+      summary = EntryTotals.calculate(
+        monthEntries,
+        scope: _scope,
+      ).checkedSummary();
     } on RangeError {
-      // Never display a wrapped or partial sum as a financial result.
       totalsOverflow = true;
     }
-    final summary = MonthSummary(incomeCents: income, expenseCents: expense);
+    final income = summary.incomeCents;
+    final expense = summary.expenseCents;
     final summaryTitle = switch (_scope) {
       EntryScope.business => 'Balanço do Negócio (Mês)',
       EntryScope.personal => 'Balanço Pessoal (Mês)',
@@ -219,6 +217,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       );
                     },
                   ),
+                  if (_scope != EntryScope.personal) ...[
+                    const SizedBox(height: 16),
+                    _summaryItem(
+                      'Retiradas para você',
+                      totalsOverflow ? '—' : formatMoney(summary.sentCents),
+                      Icons.arrow_forward,
+                      Colors.white,
+                    ),
+                  ],
+                  if (_scope != EntryScope.business) ...[
+                    const SizedBox(height: 16),
+                    _summaryItem(
+                      'Recebido do negócio',
+                      totalsOverflow ? '—' : formatMoney(summary.receivedCents),
+                      Icons.arrow_back,
+                      Colors.white,
+                    ),
+                  ],
+                  if (_scope == null)
+                    const Text(
+                      'Movimentações internas não entram nos totais gerais de entradas, saídas ou balanço.',
+                      style: TextStyle(color: Colors.white),
+                    ),
                 ],
               ),
             ),
@@ -244,6 +265,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => WithdrawalFormScreen(
+                    repository: widget.repository,
+                    onSaved: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ),
+              icon: const Icon(Icons.swap_horiz),
+              label: const Text('Pagar-me'),
             ),
             const SizedBox(height: 24),
             Wrap(
@@ -298,12 +331,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                for (final entry in displayEntries) LedgerEntry(entry: entry),
+                for (final entry in displayEntries)
+                  LedgerEntry(
+                    entry: entry,
+                    onTap: entry.isWithdrawal
+                        ? () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (context) => WithdrawalFormScreen(
+                                repository: widget.repository,
+                                existing: entry,
+                                onSaved: () => Navigator.of(context).pop(),
+                              ),
+                            ),
+                          )
+                        : null,
+                  ),
               ],
             ),
             const SizedBox(height: 16),
             const Text(
-              'Registros manuais e locais. Balanço = entradas menos saídas registradas.',
+              'Registros manuais e locais. Balanço considera entradas e saídas comuns e, por âmbito, retiradas enviadas/recebidas. Em Todos, movimentações internas são excluídas.',
               style: TextStyle(color: NotaMeiTheme.muted, fontSize: 14),
             ),
           ],

@@ -42,7 +42,12 @@ class LedgerEntry extends StatelessWidget {
     final details = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(entry.category, style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          entry.isWithdrawal ? 'Retirada do titular' : entry.category,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        if (entry.isWithdrawal)
+          const Text('Negócio → Pessoal · edição e exclusão das duas pontas'),
         const SizedBox(height: 4),
         Text(
           '${entry.scope == EntryScope.business ? 'Negócio' : 'Pessoal'} · ${formatShortDate(entry.date)}',

@@ -18,7 +18,8 @@ AnnualRecordedIncome recordedAnnualIncome(
 ) {
   final monthly = {for (var month = 1; month <= 12; month++) month: 0};
   for (final entry in entries) {
-    if (entry.date.year != year ||
+    if (entry.isWithdrawal ||
+        entry.date.year != year ||
         entry.scope != EntryScope.business ||
         entry.type != EntryType.income) {
       continue;

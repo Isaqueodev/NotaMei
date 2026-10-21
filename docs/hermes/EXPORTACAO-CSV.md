@@ -27,7 +27,7 @@ A comparação usa **datas civis** (ano/mês/dia) sem componente de hora. O inte
 - **Tipo:** Entradas e saídas (padrão), apenas Entradas ou apenas Saídas.
 - **Observações:** Desativado por padrão para reduzir exposição de dados sensíveis. Quando ativado, a coluna `observacao` é incluída.
 
-Os totais (entradas, saídas, balanço) consideram **apenas os filtros ativos**. Em "Todos", a soma agrega Negócio + Pessoal; com filtro de tipo, o resumo reflete somente esse tipo.
+Os totais consideram **apenas os filtros ativos**, separando entradas/saídas comuns de transferências enviadas/recebidas. No âmbito individual, balanço = entradas - saídas + recebidas - enviadas. Em **Todos**, internas são excluídas dos totais consolidados mesmo com apenas um tipo selecionado; os totais separados de transferências explicam as linhas internas selecionadas. Desde FB08, painel, repositório e CSV usam `EntryTotals` compartilhado. [Detalhes de retirada e migração](RETIRADA-TITULAR.md).
 
 ## Formato do arquivo
 
@@ -48,11 +48,12 @@ O TAB acrescentado permanece no dado exportado e pode afetar importações progr
 Todas as linhas (incluindo cabeçalho, lançamentos e resumo) têm as mesmas colunas:
 
 ```
-secao;periodo_inicio;periodo_fim;filtro_ambito;filtro_tipo;id;data;tipo;ambito;valor_brl;categoria;observacao?
+secao;periodo_inicio;periodo_fim;filtro_ambito;filtro_tipo;id;data;tipo;ambito;valor_brl;categoria;natureza;withdrawal_id;criterio_resumo;observacao?
 ```
 
 - Linhas `secao = Lancamento`: um lançamento por linha, com metadados repetidos (período, filtros).
-- Linhas `secao = Resumo`: três linhas de totais (Entradas, Saídas, Balanço dos registros selecionados), com `id` e `data` vazios, `tipo` = rótulo do total, `ambito` = rótulo do filtro de âmbito, `categoria` vazia.
+- Linhas `secao = Resumo`: cinco linhas de totais (Entradas, Saídas, Transferências enviadas, Transferências recebidas, Balanço dos registros selecionados), com `id` e `data` vazios, `tipo` = rótulo do total, `ambito` = rótulo do filtro de âmbito, `categoria`, `natureza` e `withdrawal_id` vazios.
+- Desde FB08, `natureza` distingue lançamento comum de retirada do titular e `withdrawal_id` identifica o par. `criterio_resumo` explica a seleção e a exclusão de internas em Todos em todas as linhas; a mesma explicação aparece na prévia. São 14 colunas sem notas e 15 com notas. A identificação não torna o relatório um backup restaurável.
 
 O nome do arquivo segue o padrão: `notamei_YYYY-MM-DD_YYYY-MM-DD.csv` (início e fim do intervalo selecionado).
 
@@ -107,6 +108,8 @@ Dois botões independentes, ambos desabilitados durante a geração ou se não h
 A documentação histórica de FB01/FB02 registra 76 testes; a de V5 registra 95. Execuções anteriores em emulador não são testes nativos desta evolução CSV. Nesta sessão, um CSV real com dados fictícios foi gerado e conferido por um parser Python independente, incluindo estrutura, aspas, múltiplas linhas, TAB e totais.
 
 ## Rollback seguro
+
+**Atenção desde FB08:** as instruções abaixo documentam o retorno histórico do incremento CSV, que não mudava o banco. Não são autorização para instalar código/esquema 1 sobre uma base já migrada para esquema 2. Consulte [reversibilidade da retirada](RETIRADA-TITULAR.md); não há downgrade de dados implementado.
 
 Branch da feature: `feature/exportacao-csv`
 Commit base (branch anterior `feature/lancamentos-sequencia-filtro-inicio`): `cd68a826a0c75e85cb00068f648872d9552a8f78`
