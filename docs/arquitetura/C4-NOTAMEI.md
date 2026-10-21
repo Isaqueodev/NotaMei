@@ -4,6 +4,8 @@
 
 **Escopo observado:** MVP Android local, incluindo FB01/FB02 na branch `feature/lancamentos-sequencia-filtro-inicio`, sobre a base `a90bc74`.
 
+> **Complemento da evolução CSV:** este documento e seus diagramas preservam o retrato anterior à exportação. Na branch `feature/exportacao-csv`, FB04 está implementado em `lib/export/`: Ajustes abre a seleção, `CsvReport` filtra o snapshot sem mutações e `ExportGateway` entrega o arquivo ao seletor de documentos ou compartilhamento Android. Arquivos exportados e aplicativos destinatários ampliam a fronteira de dados; não há backend novo nem migração de banco. Consulte [exportação CSV, validação e rollback](../hermes/EXPORTACAO-CSV.md). Menções à proposta CSV nas seções abaixo são históricas, não ausência do recurso nesta evolução.
+
 **Público:** equipe de desenvolvimento, orientação acadêmica e colaboradores.
 **Visualização:** [diagramas em HTML autossuficiente](c4-notamei.html), sem dependências de rede. Este Markdown é a fonte principal; o HTML é uma representação derivada dos diagramas.
 
@@ -40,7 +42,7 @@ O C4 organiza a estrutura estática em Contexto, Contêineres, Componentes e Có
 
 Os blocos Mermaid usam tipos explícitos, fronteiras e relações nomeadas. São uma representação **no estilo C4**, não uma especificação formal validada por ferramenta C4. Em C4, contêiner significa aplicação ou armazenamento de dados, não necessariamente Docker ou processo independente.[2]
 
-**Legenda:** `[Pessoa]` = usuário; `[Sistema externo]` = plataforma fora da fronteira do NotaMei; `[Sistema]` = produto; `[Contêiner]` = aplicação/armazenamento; `[Componente]` = grupo de responsabilidades dentro do aplicativo. Setas indicam uso/dependência e seus rótulos explicam a comunicação. Tudo nas vistas 3–8 é **atual**; propostas aparecem somente na seção 10.
+**Legenda:** `[Pessoa]` = usuário; `[Sistema externo]` = plataforma fora da fronteira do NotaMei; `[Sistema]` = produto; `[Contêiner]` = aplicação/armazenamento; `[Componente]` = grupo de responsabilidades dentro do aplicativo. Setas indicam uso/dependência e seus rótulos explicam a comunicação. As vistas 3–8 retratam o recorte observado antes da exportação CSV; a evolução de FB04 está descrita no complemento acima. As propostas da seção 10 refletem o planejamento daquele recorte.
 
 ## 2. Direcionadores e aderência acadêmica
 
