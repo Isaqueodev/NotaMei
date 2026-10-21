@@ -73,6 +73,35 @@ void main() {
     },
   );
 
+  testWidgets('Ajustes abre exportação CSV sem alterar lançamentos', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
+    preferences = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      NotaMeiApp(
+        repository: repository,
+        preferences: preferences,
+        dasService: DasReminderService(
+          preferences: preferences,
+          gateway: _Gateway(),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Ajustes').last);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Exportar CSV'),
+      150,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Exportar CSV'));
+    await tester.pumpAndSettle();
+    expect(find.text('Seus registros, fora do app'), findsOneWidget);
+    expect(repository.entries, isEmpty);
+  });
+
   testWidgets('conclusão oferece primeiro registro e abas exibem ano e DAS', (
     tester,
   ) async {

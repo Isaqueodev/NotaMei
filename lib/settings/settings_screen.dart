@@ -8,8 +8,10 @@ class SettingsScreen extends StatelessWidget {
     required this.onConfigureDas,
     required this.dasEnabled,
     this.reminderWarning,
+    this.onExportCsv,
   });
 
+  final VoidCallback? onExportCsv;
   final VoidCallback onOpenTour;
   final VoidCallback onConfigureDas;
   final bool dasEnabled;
@@ -62,6 +64,18 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const _SectionTitle('Dados e avisos'),
+          if (onExportCsv != null) ...[
+            _Sheet(
+              child: _SettingRow(
+                icon: Icons.file_download_outlined,
+                title: 'Exportar CSV',
+                subtitle:
+                    'Escolha período e filtros para salvar ou compartilhar.',
+                onTap: onExportCsv,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           const _Sheet(
             child: _SettingRow(
               icon: Icons.phone_android,
