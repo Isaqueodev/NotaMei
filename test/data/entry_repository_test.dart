@@ -151,7 +151,7 @@ void main() {
     final db = await databaseFactoryFfi.openDatabase(
       '${directory.path}/entries.db',
     );
-    expect(await db.getVersion(), 1);
+    expect(await db.getVersion(), 2);
   });
   test('invalid entries cannot enter domain', () {
     expect(() => entry('a', amount: 0), throwsArgumentError);

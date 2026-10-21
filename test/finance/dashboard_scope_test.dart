@@ -138,7 +138,10 @@ void main() {
             .selected,
         isTrue,
       );
-      expect(find.text('R\$ 0,00'), findsNWidgets(3));
+      expect(
+        find.text('R\$ 0,00'),
+        findsNWidgets(4),
+      ); // Inclui recebido do negócio.
       expect(
         find.textContaining('Nenhum lançamento pessoal neste mês.'),
         findsOneWidget,
@@ -186,7 +189,7 @@ void main() {
         find.text('Os totais deste filtro excedem o intervalo suportado.'),
         findsOneWidget,
       );
-      expect(find.text('—'), findsNWidgets(3));
+      expect(find.text('—'), findsNWidgets(4)); // Inclui a linha de retirada.
       await tester.tap(find.widgetWithText(ChoiceChip, 'Negócio'));
       await tester.pumpAndSettle();
       expect(find.text('R\$ 80,00'), findsOneWidget);
