@@ -4,18 +4,23 @@ import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
 import 'csv_export.dart';
 import 'export_gateway.dart';
+import 'pdf_export.dart';
+
+enum ExportFormat { csv, pdf }
 
 class ExportScreen extends StatefulWidget {
   const ExportScreen({
     super.key,
     required this.repository,
     this.initialDate,
+    this.format = ExportFormat.csv,
     this.save,
     this.share,
   });
 
   final EntryRepository repository;
   final DateTime? initialDate;
+  final ExportFormat format;
   final ExportAction? save;
   final ExportAction? share;
 
@@ -30,13 +35,21 @@ class _ExportScreenState extends State<ExportScreen> {
   EntryType? _type;
   bool _notes = false;
   bool _busy = false;
+  CsvReport? _exportingReport;
   String? _message;
   final _gateway = ExportGateway();
+  String get _formatLabel => widget.format == ExportFormat.pdf ? 'PDF' : 'CSV';
+
+  Future<ExportOutcome> _savePdf(CsvReport report) async =>
+      _gateway.saveDocument(await buildPdfReport(report));
+  Future<ExportOutcome> _sharePdf(CsvReport report) async =>
+      _gateway.shareDocument(await buildPdfReport(report));
 
   Future<void> _export(CsvReport report, ExportAction action) async {
     if (_busy || report.entries.isEmpty) return;
     setState(() {
       _busy = true;
+      _exportingReport = report;
       _message = null;
     });
     try {
@@ -44,7 +57,7 @@ class _ExportScreenState extends State<ExportScreen> {
       if (!mounted) return;
       setState(
         () => _message = switch (outcome) {
-          ExportOutcome.saved => 'CSV salvo no local escolhido.',
+          ExportOutcome.saved => '$_formatLabel salvo no local escolhido.',
           ExportOutcome.shared =>
             'Arquivo entregue ao aplicativo escolhido. Confirme nele o envio.',
           ExportOutcome.cancelled =>
@@ -52,6 +65,8 @@ class _ExportScreenState extends State<ExportScreen> {
           ExportOutcome.unconfirmed => 'Compartilhamento aberto. Confirme o resultado no aplicativo escolhido.',
         },
       );
+    } on PdfExportLimitException catch (error) {
+      if (mounted) setState(() => _message = error.message);
     } catch (_) {
       if (mounted) {
         setState(
@@ -59,7 +74,12 @@ class _ExportScreenState extends State<ExportScreen> {
         );
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _exportingReport = null;
+        });
+      }
     }
   }
 
@@ -85,21 +105,23 @@ class _ExportScreenState extends State<ExportScreen> {
   Widget build(BuildContext context) => PopScope(
     canPop: !_busy,
     child: Scaffold(
-      appBar: AppBar(title: const Text('Exportar CSV')),
+      appBar: AppBar(title: Text('Exportar $_formatLabel')),
       body: SafeArea(
         child: AnimatedBuilder(
           animation: widget.repository,
           builder: (context, _) {
-            final report = CsvReport.generate(
-              widget.repository.entries,
-              ExportSelection(
-                anchor: _anchor,
-                period: _period,
-                scope: _scope,
-                type: _type,
-                includeNotes: _notes,
-              ),
-            );
+            final report =
+                _exportingReport ??
+                CsvReport.generate(
+                  widget.repository.entries,
+                  ExportSelection(
+                    anchor: _anchor,
+                    period: _period,
+                    scope: _scope,
+                    type: _type,
+                    includeNotes: _notes,
+                  ),
+                );
             return ListView(
               padding: const EdgeInsets.all(20),
               children: [
@@ -108,8 +130,8 @@ class _ExportScreenState extends State<ExportScreen> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'O arquivo contém dados financeiros. Escolha com cuidado onde salvar ou com quem compartilhar. CSV não é backup restaurável nem documento fiscal.',
+                Text(
+                  'O arquivo contém dados financeiros. Escolha com cuidado onde salvar ou com quem compartilhar. $_formatLabel não é backup restaurável nem documento fiscal.',
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<ExportPeriod>(
@@ -266,15 +288,27 @@ class _ExportScreenState extends State<ExportScreen> {
                 FilledButton(
                   onPressed: _busy || report.entries.isEmpty
                       ? null
-                      : () => _export(report, widget.save ?? _gateway.save),
-                  child: const Text('Salvar CSV'),
+                      : () => _export(
+                          report,
+                          widget.save ??
+                              (widget.format == ExportFormat.pdf
+                                  ? _savePdf
+                                  : _gateway.save),
+                        ),
+                  child: Text('Salvar $_formatLabel'),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: _busy || report.entries.isEmpty
                       ? null
-                      : () => _export(report, widget.share ?? _gateway.share),
-                  child: const Text('Compartilhar CSV'),
+                      : () => _export(
+                          report,
+                          widget.share ??
+                              (widget.format == ExportFormat.pdf
+                                  ? _sharePdf
+                                  : _gateway.share),
+                        ),
+                  child: Text('Compartilhar $_formatLabel'),
                 ),
               ],
             );
