@@ -80,10 +80,11 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
     );
   }
 
-  void _openExport() {
+  void _openExport({ExportFormat format = ExportFormat.csv}) {
     _navigatorKey.currentState?.push(
       MaterialPageRoute<void>(
-        builder: (_) => ExportScreen(repository: widget.repository),
+        builder: (_) =>
+            ExportScreen(repository: widget.repository, format: format),
       ),
     );
   }
@@ -141,6 +142,7 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
         SettingsScreen(
           onOpenTour: _reviewTour,
           onExportCsv: _openExport,
+          onExportPdf: () => _openExport(format: ExportFormat.pdf),
           onConfigureDas: _openDas,
           dasEnabled: widget.dasService.enabled,
           reminderWarning: widget.reminderWarning,

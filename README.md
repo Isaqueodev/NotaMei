@@ -16,7 +16,7 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 | Pagar-me | Registrar uma **Retirada do titular**: saída do Negócio e entrada no Pessoal vinculadas, com edição/exclusão conjunta. Não duplica entradas/saídas gerais nem receita anual. É registro manual, sem transferência real ou classificação fiscal automática. |
 | Histórico | Navegar por mês e filtrar os registros por Negócio/Pessoal e Entrada/Saída. |
 | Ano | Ver a soma por mês e o total das **entradas do negócio informadas** no ano corrente. Meses sem registro não são tratados como meses sem movimento. |
-| Ajustes | Ativar ou desativar um lembrete local relacionado ao DAS, escolhendo dia do mês e horário. Rever o tour. Exportar relatório CSV por período e filtros, para salvar localmente ou compartilhar. |
+| Ajustes | Ativar ou desativar um lembrete local relacionado ao DAS, escolhendo dia do mês e horário. Rever o tour. Exportar relatórios CSV ou PDF por período e filtros, para salvar localmente ou compartilhar. |
 
 ### Exemplo de uso
 
@@ -25,14 +25,14 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 3. Para registrar uma sequência, use **Salvar e adicionar outro**: valor e observação são limpos somente após salvar; tipo, âmbito, categoria e data são mantidos e o foco volta ao valor. Use o salvamento normal para voltar ou a seta de retorno para encerrar a sequência. Na edição, apenas o salvamento normal é oferecido.
 4. Registre uma despesa do negócio ou um gasto **Pessoal**. No **Início**, alterne Negócio/Pessoal/Todos para filtrar os totais e os recentes; a seleção é mantida durante a navegação nessa sessão, não após reiniciar o app. Registros pessoais não entram nos totais identificados como do negócio nem no acompanhamento anual comercial.
 5. Consulte **Histórico** para localizar ou corrigir um lançamento e **Ano** para acompanhar o que foi informado.
-6. Em **Ajustes → Exportar CSV**, escolha data de referência, período (dia/semana/mês/ano), âmbitos, tipos e se inclui observações; visualize a prévia e use **Salvar CSV** (seletor de arquivos local) ou **Compartilhar CSV** (Share Sheet nativo). O CSV não é backup restaurável nem documento fiscal.
+6. Em **Ajustes → Exportar CSV** ou **Exportar PDF**, escolha data de referência, período (dia/semana/mês/ano), âmbitos, tipos e se inclui observações; confira a prévia e use **Salvar** (seletor de arquivos local) ou **Compartilhar** (Share Sheet nativo), no formato escolhido. Nenhum formato é backup restaurável nem documento fiscal. O PDF é paginado e inclui os mesmos totais e critérios de retirada do CSV; veja [limites e validação do PDF](docs/hermes/EXPORTACAO-PDF.md).
 7. Se desejar, abra **Ajustes → Configurar lembrete**, escolha dia e horário e ative o aviso. Confira sempre a situação do DAS nos canais oficiais.
 
 ## Retirada do titular (FB08)
 
 No **Início → Pagar-me**, informe valor positivo em pt-BR, data e observação opcional. O app registra as duas pontas da movimentação **Negócio → Pessoal** em uma transação. Toque numa ponta no Histórico ou nos recentes para editar/excluir o par; a confirmação explica que ambas são afetadas. Não use um lançamento comum para registrar novamente a outra ponta.
 
-Entradas/Saídas mostram apenas movimentos comuns. **Retiradas para você** e **Recebido do negócio** explicam o efeito por âmbito; em **Todos**, internas não afetam entradas, saídas nem balanço, inclusive no CSV com filtro de tipo. O anual continua somando apenas entradas comerciais externas. O app permite registrar retirada com balanço negativo: histórico parcial não informa capacidade de pagamento. Não calcula encargos, folha, lucro distribuível ou classificação automática de pró-labore/lucros.
+Entradas/Saídas mostram apenas movimentos comuns. **Retiradas para você** e **Recebido do negócio** explicam o efeito por âmbito; em **Todos**, internas não afetam entradas, saídas nem balanço, inclusive em CSV/PDF com filtro de tipo. O anual continua somando apenas entradas comerciais externas. O app permite registrar retirada com balanço negativo: histórico parcial não informa capacidade de pagamento. Não calcula encargos, folha, lucro distribuível ou classificação automática de pró-labore/lucros.
 
 O SQLite passa de esquema 1 para **2** por migração aditiva, sem inferir vínculos de registros antigos. Preferências não são alteradas. Voltar o código para `rollback/pre-retiradas-9619b3a` **não** restaura dados e não autoriza instalar um APK de esquema 1 sobre a base migrada. Não existe downgrade de dados implementado. Consulte [modelagem, cálculos, testes e reversibilidade](docs/hermes/RETIRADA-TITULAR.md).
 
@@ -40,7 +40,7 @@ O SQLite passa de esquema 1 para **2** por migração aditiva, sem inferir vínc
 
 Depois que o APK é instalado, **o cabo USB pode ser desconectado**: ele foi necessário para instalação e depuração, não para abrir ou usar o aplicativo. Os lançamentos e configurações ficam no próprio aparelho; as funções centrais de registro e consulta não exigem conexão com a internet nem conta no NotaMei. Encerrar e reabrir o app normalmente não apaga os lançamentos.
 
-**Cuide dos dados:** limpar os dados do aplicativo ou desinstalá-lo pode apagar os registros locais. O NotaMei oferece **exportação de relatório CSV** (Ajustes → Exportar CSV) para salvar ou compartilhar os dados fora do app; **não há backup/restauração próprios, exportação PDF, conta ou sincronização**. O CSV não é restaurável. Eventuais cópias feitas pelo sistema Android dependem das configurações do aparelho e **não devem ser presumidas como backup garantido**.
+**Cuide dos dados:** limpar os dados do aplicativo ou desinstalá-lo pode apagar os registros locais. O NotaMei oferece **relatórios CSV e PDF** em Ajustes para salvar ou compartilhar os dados fora do app; **não há backup/restauração próprios, conta ou sincronização**. Nenhum relatório é restaurável. Eventuais cópias feitas pelo sistema Android dependem das configurações do aparelho e **não devem ser presumidas como backup garantido**.
 
 Os lembretes dependem de permissão de notificações e das políticas de agendamento e economia de bateria do Android. O app solicita a permissão ao ativar o lembrete; não há garantia de entrega pontual. Para dias 29, 30 ou 31 em meses mais curtos, o aviso é ajustado para o último dia do mês. Há uma janela de agendamentos futuros renovada ao abrir o app.
 
@@ -48,13 +48,13 @@ Os lembretes dependem de permissão de notificações e das políticas de agenda
 
 - **Não é um sistema bancário:** não acessa contas, extratos ou Pix; nenhum valor é importado automaticamente.
 - **Não apura obrigações fiscais:** o resumo anual considera apenas entradas do negócio que você registrou. Não certifica faturamento fiscal, lucro, limite legal, regularidade ou meses sem movimento.
-- **Exportação CSV não é backup nem documento fiscal:** o arquivo gerado em Ajustes → Exportar CSV serve para levar os dados para fora do app; não pode ser importado para restaurar o banco e não comprova faturamento, regularidade ou quitação. Consulte [docs/hermes/EXPORTACAO-CSV.md](docs/hermes/EXPORTACAO-CSV.md).
+- **Exportação CSV/PDF não é backup nem documento fiscal:** os relatórios servem para levar os dados para fora do app; não podem restaurar o banco e não comprovam faturamento, regularidade ou quitação. Consulte [CSV](docs/hermes/EXPORTACAO-CSV.md) e [PDF](docs/hermes/EXPORTACAO-PDF.md).
 - **Não consulta nem paga o DAS:** o dia do lembrete é escolhido por você, **não** é um vencimento legal calculado pelo app. O aviso não confirma emissão, pagamento ou quitação. Consulte os canais oficiais e, quando necessário, orientação contábil.
 - **Não é uma versão de distribuição:** o APK de depuração serve para testes e apresentação. Uma distribuição pública requer preparação e assinatura próprias, além de validações adicionais.
 
 ## Tecnologia e desenvolvimento
 
-O aplicativo é desenvolvido em **Flutter/Dart** para Android. Lançamentos são persistidos em SQLite (`sqflite`); preferências de primeiro uso e lembrete usam `shared_preferences`; o agendamento local usa `flutter_local_notifications`; a exportação CSV usa `flutter_file_dialog` e `share_plus`. Não há backend ou sincronização implementados nesta versão.
+O aplicativo é desenvolvido em **Flutter/Dart** para Android. Lançamentos são persistidos em SQLite (`sqflite`); preferências de primeiro uso e lembrete usam `shared_preferences`; o agendamento local usa `flutter_local_notifications`; a saída CSV/PDF usa `flutter_file_dialog` e `share_plus`, e a renderização PDF usa o pacote `pdf` com assets locais. Não há backend ou sincronização implementados nesta versão.
 
 Estrutura principal:
 
@@ -65,7 +65,7 @@ lib/finance/     Início, formulário e histórico
 lib/annual/      Acompanhamento anual descritivo
 lib/das/         Configuração e agendamento de lembretes
 lib/data/        Modelo e persistência dos lançamentos
-lib/export/      Exportação CSV (relatório, gateway, tela)
+lib/export/      Seleção/prévia comum, geradores CSV/PDF e gateway nativo
 test/            Testes automatizados por área
 ```
 
@@ -94,7 +94,7 @@ Consulte o [recorte implementado, validações e limites do V5](docs/hermes/V5-I
 
 ## Estado do projeto
 
-Esta versão cobre o fluxo local de apresentação, uso manual e **exportação de relatório CSV** (Ajustes → Exportar CSV). **Backup/restauração próprios, exportação PDF, sincronização, integrações externas e regras fiscais automáticas não estão implementados**. O CSV não é restaurável nem documento fiscal. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
+Esta versão cobre o fluxo local de apresentação, uso manual e **relatórios CSV/PDF**, acessíveis em Ajustes. **Backup/restauração próprios, sincronização, integrações externas e regras fiscais automáticas não estão implementados**. Relatórios não são restauráveis nem documentos fiscais. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
 
 Para continuar o desenvolvimento com o Hermes Agent em outro computador, consulte [as instruções de migração para Windows](docs/hermes/IMPORTAR-WINDOWS.md) e a [síntese compartilhável de requisitos e arquitetura](docs/hermes/REQUISITOS-ARQUITETURA.md). Elas transferem apenas conhecimento revisado e não incluem respostas individuais da pesquisa, conversas ou credenciais.
 
