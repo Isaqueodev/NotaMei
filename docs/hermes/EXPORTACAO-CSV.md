@@ -2,6 +2,8 @@
 
 **Versão da funcionalidade:** implementada na branch `feature/exportacao-csv`, sobre o commit `cd68a826a0c75e85cb00068f648872d9552a8f78` da branch anterior `feature/lancamentos-sequencia-filtro-inicio`. Este documento não substitui validação em aparelho físico.
 
+> **Evolução PDF:** a branch `feature/exportacao-pdf` conserva CSV e seus contratos públicos, acrescenta saída tipada por bytes/nome/MIME ao gateway e congela a prévia durante a operação em ambos os formatos. A suíte integrada dessa evolução passou em 142 testes; as contagens abaixo descrevem a entrega histórica CSV. Consulte [PDF, limites e validação](EXPORTACAO-PDF.md).
+
 ## Acesso
 
 Ajustes → Exportar CSV. A tela carrega os lançamentos do repositório local e mostra a prévia do intervalo, filtros, contagem e totais antes de gerar o arquivo.

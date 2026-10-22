@@ -6,6 +6,8 @@
 
 > **Complemento da evolução CSV:** este documento e seus diagramas preservam o retrato anterior à exportação. Na branch `feature/exportacao-csv`, FB04 está implementado em `lib/export/`: Ajustes abre a seleção, `CsvReport` filtra o snapshot sem mutações e `ExportGateway` entrega o arquivo ao seletor de documentos ou compartilhamento Android. Arquivos exportados e aplicativos destinatários ampliam a fronteira de dados; não há backend novo nem migração de banco. Consulte [exportação CSV, validação e rollback](../hermes/EXPORTACAO-CSV.md). Menções à proposta CSV nas seções abaixo são históricas, não ausência do recurso nesta evolução.
 
+> **Complemento PDF (FB05):** em `feature/exportacao-pdf`, Ajustes também abre PDF. `buildPdfReport` renderiza em isolate o mesmo snapshot/totais de `CsvReport`, com Inter e marca locais; `ExportDocument` transporta bytes imutáveis/nome/MIME para `ExportGateway.saveDocument/shareDocument`. CSV conserva seus contratos. Não há novo servidor, banco, migração ou escrita financeira. Os diagramas históricos abaixo não incluem esses componentes; a vista atual resumida está em [requisitos e arquitetura](../hermes/REQUISITOS-ARQUITETURA.md#4-arquitetura-implementada). [Escopo, limites, testes e rollback PDF](../hermes/EXPORTACAO-PDF.md).
+
 **Público:** equipe de desenvolvimento, orientação acadêmica e colaboradores.
 **Visualização:** [diagramas em HTML autossuficiente](c4-notamei.html), sem dependências de rede. Este Markdown é a fonte principal; o HTML é uma representação derivada dos diagramas.
 

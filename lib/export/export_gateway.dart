@@ -2,6 +2,7 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'csv_export.dart';
+import 'export_document.dart';
 
 enum ExportOutcome { saved, shared, cancelled, unconfirmed }
 
@@ -14,23 +15,39 @@ class ExportGateway {
 
   final Future<ShareResult> Function(ShareParams) _shareFile;
 
-  Future<ExportOutcome> save(CsvReport report) async {
+  Future<ExportOutcome> save(CsvReport report) => saveDocument(
+    ExportDocument(
+      bytes: report.bytes,
+      filename: report.filename,
+      mimeType: 'text/csv',
+    ),
+  );
+
+  Future<ExportOutcome> share(CsvReport report) => shareDocument(
+    ExportDocument(
+      bytes: report.bytes,
+      filename: report.filename,
+      mimeType: 'text/csv',
+    ),
+  );
+
+  Future<ExportOutcome> saveDocument(ExportDocument document) async {
     final destination = await FlutterFileDialog.saveFile(
       params: SaveFileDialogParams(
-        data: report.bytes,
-        fileName: report.filename,
-        mimeTypesFilter: const ['text/csv'],
+        data: document.bytes,
+        fileName: document.filename,
+        mimeTypesFilter: [document.mimeType],
         localOnly: true,
       ),
     );
     return destination == null ? ExportOutcome.cancelled : ExportOutcome.saved;
   }
 
-  Future<ExportOutcome> share(CsvReport report) async {
+  Future<ExportOutcome> shareDocument(ExportDocument document) async {
     final result = await _shareFile(
       ShareParams(
-        files: [XFile.fromData(report.bytes, mimeType: 'text/csv')],
-        fileNameOverrides: [report.filename],
+        files: [XFile.fromData(document.bytes, mimeType: document.mimeType)],
+        fileNameOverrides: [document.filename],
         title: 'Exportação NotaMei',
       ),
     );
