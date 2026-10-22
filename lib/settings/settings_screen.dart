@@ -9,9 +9,11 @@ class SettingsScreen extends StatelessWidget {
     required this.dasEnabled,
     this.reminderWarning,
     this.onExportCsv,
+    this.onExportPdf,
   });
 
   final VoidCallback? onExportCsv;
+  final VoidCallback? onExportPdf;
   final VoidCallback onOpenTour;
   final VoidCallback onConfigureDas;
   final bool dasEnabled;
@@ -72,6 +74,18 @@ class SettingsScreen extends StatelessWidget {
                 subtitle:
                     'Escolha período e filtros para salvar ou compartilhar.',
                 onTap: onExportCsv,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (onExportPdf != null) ...[
+            _Sheet(
+              child: _SettingRow(
+                icon: Icons.picture_as_pdf_outlined,
+                title: 'Exportar PDF',
+                subtitle:
+                    'Relatório para leitura, com os mesmos períodos e filtros.',
+                onTap: onExportPdf,
               ),
             ),
             const SizedBox(height: 12),
