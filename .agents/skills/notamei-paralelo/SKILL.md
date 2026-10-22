@@ -1,34 +1,40 @@
 ---
 name: notamei-paralelo
-description: Use quando desenvolver ou revisar o NotaMei. Preserve privacidade, valide Flutter e Android, separe o trabalho da main.
+description: "Trabalhe no NotaMei preservando regras e dados."
+license: MIT
+metadata:
+  author: "Equipe NotaMei, Hermes Agent"
+  version: "0.2.0"
 ---
 
-# NotaMei: trabalho verificável
+# NotaMei — mudança pequena e verificável
 
-Este conhecimento foi adaptado para ser portátil entre Linux e Windows. **Não use caminhos absolutos da máquina de origem.** Localize o clone do projeto no computador atual, confirme `git status --short --branch`, leia `README.md`, `pubspec.yaml` e eventuais instruções locais antes de editar. Não presuma que a branch ou o aparelho conectado sejam os mesmos da exportação. O código e a documentação versionada estão no Git; este arquivo guarda lições de trabalho, não substitui o repositório.
+## Quando usar
 
-## Produto e privacidade
+Ao analisar, desenvolver ou revisar o NotaMei, em qualquer IA. Não depende de Hermes nem de serviço pago. Pedro Isaque é o proprietário; os demais integrantes usam as ferramentas que escolherem.
 
-- Projeto acadêmico extensionista Android/Flutter para microempreendedores individuais. Lançamentos são manuais e persistidos em SQLite no aparelho; preferências de primeiro uso e lembretes são locais. Nesta versão não há conta, backend, sincronização própria, integração bancária ou exportação/backup próprios.
-- Separe Negócio de Pessoal em cada registro. O balanço mensal do negócio é entradas menos saídas informadas, não saldo bancário. O acompanhamento anual soma somente entradas comerciais registradas, sem deduzir despesas ou inferir faturamento fiscal oficial, lucro, teto legal ou regularidade. Mês sem lançamento não prova ausência de movimento.
-- O lembrete do DAS usa dia e hora escolhidos pela pessoa; nunca chame essa data de vencimento oficial ou o aviso de confirmação de pagamento. A entrega depende das permissões e da economia de bateria do Android.
-- Preserve fora do Git e de serviços externos a pesquisa individual e referências visuais de terceiros. No clone original, `.gitignore` protege `docs/analise-requisitos-arquitetura.md` e `referencias de design/`; confira as regras no clone atual antes de `git add`. Não inclua credenciais, sessões, APKs ou dados de teste no commit.
+## Pré-requisitos
 
-## Experiência do usuário
+Leia [AGENTS.md](../../../AGENTS.md), a tarefa aprovada e as seções relevantes de [requisitos e RN](../../../docs/hermes/REQUISITOS-ARQUITETURA.md). Caminhos de código citados a seguir são relativos à raiz do clone. Sem acesso a arquivos/terminal, peça os trechos e não finja execução.
 
-- No primeiro uso, oferecer “Ver como funciona” ou “Começar sem tour”. Pular qualquer etapa leva ao Início; após os três passos instrutivos existe uma tela de conclusão distinta com “Pronto para começar”. É possível rever o tour em Ajustes. Não pedir permissão no tour.
-- Nos testes com MEIs, use dados fictícios. Não anuncie integrações nem cálculos fiscais ainda não implementados. A instalação do APK não depende do USB após instalada; limpar dados/desinstalar pode apagar registros. Não prometa backup do Android.
+## Procedimento
 
-## Implementação e testes
+1. Confira branch/HEAD/alterações e identifique arquivos permitidos. Não sobrescreva trabalho alheio nem crie nova implementação de algo já existente.
+2. Leia a API real e os testes próximos. Apresente resultado esperado, mudança mínima e como verificar. Se a regra estiver indefinida, peça decisão a Pedro.
+3. Preserve as invariantes de AGENTS.md: centavos e totais exatos, âmbitos, vínculo das duas pontas, anual comercial, notas opt-in e seleção comum CSV/PDF. As três funcionalidades CSV, PDF e retirada já existem; relatório não é backup.
+4. Faça uma fatia por vez, com teste que reproduza a alteração de comportamento antes do patch. Use os nomes e assinaturas encontrados no código, não os de exemplos externos.
+5. Rode o teste direcionado, `flutter analyze` e `flutter test` quando a alteração for executável. Se algo não puder rodar, registre o bloqueio e deixe a validação pendente. Não instale ferramentas nem altere dependências por conta própria.
+6. Confira diff/status e entregue arquivos, comandos/resultados reais, riscos e pendências. Commit, merge e push exigem autorização específica; a entrega padrão é o diff para revisão.
 
-- Valores monetários são centavos inteiros; valide limites antes das somas mensais e anuais. Persistência deve preceder atualização visível. Bloqueie toque repetido enquanto salva e ofereça erro legível para nova tentativa em falha.
-- Testes Flutter de widget com SQLite FFI: inicialize a factory FFI sem isolate; para I/O real disparado por toques, use `tester.runAsync` no escopo apropriado e intercale pequenas esperas reais com `pumpAndSettle`. Fechar a base em `tearDown` fora dessa zona pode travar a suíte. Confirme primeiro o teste direcionado, depois a suíte completa.
-- `flutter_local_notifications` espera o nome do ícone passado a `AndroidInitializationSettings` como recurso Android válido em `drawable` (no projeto: `ic_notification`), não apenas um launcher em `mipmap`. Teste o recurso, a permissão pedida ao ativar e o agendamento/cancelamento. Se reagendamento falhar parcialmente ou permissão for revogada, cancele os alarmes próprios e não mantenha a preferência como ativa. Agendamento observado não comprova entrega futura.
-- Antes de operar um dispositivo com ADB, confirme modelo e pacote. Não faça toques nem capturas se outro app estiver em primeiro plano; não limpe dados reais sem autorização. Quando houver aparelho, confira a atividade em primeiro plano antes de cada ação. Na revisão original, o Samsung A17 foi usado, mas não assuma que está conectado no Windows.
-- Use `flutter analyze`, `flutter test` e `flutter build apk --debug` como validação local. Revise assinatura antes de distribuir: a configuração original de `release` usa certificado Android Debug, adequada apenas para testes controlados, não publicação. A instalação manual pode disparar avisos do Play Protect; um aviso de app desconhecido não prova vírus nem prova falso positivo. Não oriente a desativar proteção; investigue o texto exato de alertas graves.
+## Armadilhas
 
-## Trabalho paralelo e Git
+- Datas/contagens em documentos de migração são históricas, não execução atual.
+- `EntryTotals` centraliza resumos; filtro Todos não deve voltar a contar retirada como receita/despesa externa.
+- `enable`, `disable` e `refresh` do DAS não têm os mesmos caminhos de falha. Não generalize o comportamento de um para os outros.
+- Em testes Flutter/SQLite, confira o padrão local de FFI e `tester.runAsync`; não introduza outra inicialização sem necessidade. Indicador indeterminado com `Completer` pendente não deve ser esperado com `pumpAndSettle` infinito.
+- Nunca apague dados/reinstale como recuperação automática. Versão de código não é restauração de banco.
+- Preserve marca N/fontes locais. Não envie pesquisa privada, bancos, credenciais ou capturas reais à IA.
 
-- Divida escopos independentes entre agentes, preferencialmente com worktrees e branches próprios, e revise os diffs no repositório principal antes de integrar. Agentes Hermes isolados podem ver apenas HEAD, não alterações staged/untracked do checkout principal; uma revisão desses worktrees limpos **não** aprova o diff real. Faça revisão somente leitura onde o diff esteja presente e confira `git diff --cached`.
-- Houve falhas com prompts relativos fora do worktree; use caminhos absolutos resolvidos no computador atual e confirme que o trabalhador leu os arquivos certos. Um teste curto de um provedor não garante que uma tarefa longa funcione; trate erros de serviço como bloqueios, sem simular resultado.
-- Preserve a `main`; só comite após implementação e validação. Não faça merge/push sem autorização específica da tarefa corrente. Verifique `git status`, `git diff --check` e o histórico real antes de declarar que houve commit. Relate separadamente build local, instalação no dispositivo e entrega futura de notificações.
+## Verificação
+
+Aceite exige escopo atendido, nenhum arquivo inesperado no diff, regras preservadas e evidências reais ou marcação explícita de não executado. Build, instalação, teste nativo e uso observado são verificações distintas. Skill reduz ambiguidade; não garante ausência de alucinação.
