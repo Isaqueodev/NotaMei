@@ -52,6 +52,18 @@ Os lembretes dependem de permissão de notificações e das políticas de agenda
 - **Não consulta nem paga o DAS:** o dia do lembrete é escolhido por você, **não** é um vencimento legal calculado pelo app. O aviso não confirma emissão, pagamento ou quitação. Consulte os canais oficiais e, quando necessário, orientação contábil.
 - **Não é uma versão de distribuição:** o APK de depuração serve para testes e apresentação. Uma distribuição pública requer preparação e assinatura próprias, além de validações adicionais.
 
+## Colaboração da equipe e uso de IA
+
+Pedro Isaque é o proprietário do repositório e, no momento, o único integrante que usa Hermes. As orientações dos colaboradores são independentes de IA/assinatura; não presumem que todos tenham Hermes ou acesso ao mesmo ambiente.
+
+- [Checklist de Matheus Rocha, Raphael Max e Luchie Bonates](docs/colaboracao/CHECKLIST-EQUIPE.md), com papéis propostos, prioridades e critérios de aceite.
+- [Diagnóstico do repositório e limites da inspeção](docs/colaboracao/DIAGNOSTICO-REPOSITORIO.md).
+- [Benchmark de funcionalidades e esforço relativo](docs/colaboracao/BENCHMARK-FUNCIONALIDADES.md).
+- [Guia para trabalhar com IA](docs/colaboracao/GUIA-IA-EQUIPE.md) e [contrato de tarefa pequena](docs/colaboracao/TAREFA-PARA-IA.md).
+- [AGENTS.md](AGENTS.md) e skills compartilháveis em `.agents/skills/` — carregar/fornecer manualmente quando a ferramenta não as reconhecer. Orientações não garantem ausência de alucinações nem dispensam revisão/testes.
+
+São documentos versionáveis, sem dados privados. Novas funcionalidades do benchmark são propostas, não autorização automática para implementar.
+
 ## Tecnologia e desenvolvimento
 
 O aplicativo é desenvolvido em **Flutter/Dart** para Android. Lançamentos são persistidos em SQLite (`sqflite`); preferências de primeiro uso e lembrete usam `shared_preferences`; o agendamento local usa `flutter_local_notifications`; a saída CSV/PDF usa `flutter_file_dialog` e `share_plus`, e a renderização PDF usa o pacote `pdf` com assets locais. Não há backend ou sincronização implementados nesta versão.
