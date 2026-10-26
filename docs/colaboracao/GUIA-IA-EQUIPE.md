@@ -6,7 +6,7 @@
 
 | Pessoa | Foco inicial proposto | Skill da atividade |
 | --- | --- | --- |
-| Matheus Rocha | Mudanças pequenas, inicialização e preparação da entrega | [Implementação segura](../../.agents/skills/notamei-implementacao-segura/SKILL.md) |
+| Matheus Rebelo | Mudanças pequenas, inicialização e preparação da entrega | [Implementação segura](../../.agents/skills/notamei-implementacao-segura/SKILL.md) |
 | Raphael Max | Lembretes, testes Android e evidências | [Validação Android](../../.agents/skills/notamei-validacao-android/SKILL.md) |
 | Luchie Bonates | Coerência documental, pesquisa e acessibilidade | [Documentação/pesquisa](../../.agents/skills/notamei-documentacao-pesquisa/SKILL.md) |
 | Pedro Isaque | Priorizar, aprovar regras/escopo, revisar e integrar contribuições | [Skill geral](../../.agents/skills/notamei-paralelo/SKILL.md) e [AGENTS.md](../../AGENTS.md) |
