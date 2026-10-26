@@ -13,7 +13,7 @@ Contexto: [diagnóstico e limites da auditoria](DIAGNOSTICO-REPOSITORIO.md), [be
 - [ ] Revisar diffs e evidências, resolver arquivos compartilhados e decidir commits/merge/publicação. O Hermes não é requisito para a contribuição dos demais.
 - [ ] Confirmar com orientação o que conta como IA/API e quais evidências acadêmicas são exigidas.
 
-## Matheus Rocha — proposta de foco em inicialização e entrega
+## Matheus Rebelo — proposta de foco em inicialização e entrega
 
 Skill principal: [implementação segura](../../.agents/skills/notamei-implementacao-segura/SKILL.md).
 
