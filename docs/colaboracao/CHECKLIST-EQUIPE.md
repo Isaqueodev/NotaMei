@@ -13,11 +13,11 @@ Contexto: [diagnóstico e limites da auditoria](DIAGNOSTICO-REPOSITORIO.md), [be
 - [ ] Revisar diffs e evidências, resolver arquivos compartilhados e decidir commits/merge/publicação. O Hermes não é requisito para a contribuição dos demais.
 - [ ] Confirmar com orientação o que conta como IA/API e quais evidências acadêmicas são exigidas.
 
-## Matheus Rocha — proposta de foco em inicialização e entrega
+## Matheus Rebelo — proposta de foco em inicialização e entrega
 
 Skill principal: [implementação segura](../../.agents/skills/notamei-implementacao-segura/SKILL.md).
 
-- [ ] **T01 — inicialização recuperável (prioridade 1; esforço médio).** Preparar e, se aprovado, implementar erro/retry para falha de abertura sem apagar dados. Escopo provável: `lib/main.dart`, nova tela de inicialização e teste próprio em `test/app/`; sem editar repositório/banco nesta fatia. **Aceite:** falha injetada exibe orientação segura; retry abre os registros; não recria/limpa base; falha de lembrete continua não bloqueante. **Revisão cruzada:** Raphael.
+- [X] **T01 — inicialização recuperável (prioridade 1; esforço médio).** Preparar e, se aprovado, implementar erro/retry para falha de abertura sem apagar dados. Escopo provável: `lib/main.dart`, nova tela de inicialização e teste próprio em `test/app/`; sem editar repositório/banco nesta fatia. **Aceite:** falha injetada exibe orientação segura; retry abre os registros; não recria/limpa base; falha de lembrete continua não bloqueante. **Revisão cruzada:** Raphael.
 - [ ] **T06 — plano de versão e atualização (prioridade 1; médio).** Documentar candidato, identidade, assinatura atual e atualização com base fictícia. Documento novo proposto: `docs/entrega/VERSAO-E-ATUALIZACAO.md`. **Aceite:** distinguir teste de produção, preservar registros/preferências no ensaio e registrar limites; qualquer alteração em Gradle/pubspec ou chaves depende de Pedro. Não publicar. **Revisão:** Pedro.
 - [ ] **T09 — roteiro reproduzível de demonstração (prioridade 0; pequeno).** Documento novo proposto: `docs/entrega/ROTEIRO-DEMONSTRACAO.md`. Usar resultados de T05 e dados fictícios. **Aceite:** mostrar tour, sequência, filtros, retirada, anual, CSV/PDF e reabertura; ter contingência para falha de arquivo/lembrete; não chamar balanço de saldo/lucro nem agendamento de entrega. **Revisão:** Luchie.
 - [ ] Depois das prioridades e de aprovação, assumir **H01 — busca textual no Histórico** do benchmark, sem sobrepor alterações de outra pessoa no mesmo arquivo.
