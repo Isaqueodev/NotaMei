@@ -104,6 +104,37 @@ O novo visual está implementado em Flutter no Início, Histórico, formulário/
 
 Consulte o [recorte implementado, validações e limites do V5](docs/hermes/V5-IMPLEMENTACAO.md). A interface foi exercitada no emulador. Após alinhar também o ícone Android à paleta V5, a suíte integrada teve 95 testes aprovados, análise estática limpa e novo APK debug com assets conferidos. O novo visual ainda precisa de avaliação no aparelho físico.
 
+## T01 — Inicialização recuperável
+
+A Tarefa T01 teve como objetivo tornar a inicialização do app resiliente: se a abertura do banco falhasse, a interface deveria aparecer com uma tela de erro e opção de tentar novamente, sem apagar dados.
+
+### O que foi alterado
+
+| Arquivo | Alteração |
+| --- | --- |
+| `lib/main.dart` | O ponto de entrada agora chama `runApp(StartupScreen(repository: EntryRepository()))` imediatamente, sem `await repository.initialize()`, `SharedPreferences` ou inicialização do DAS. |
+| `lib/app/startup_screen.dart` | Novo widget `StatefulWidget` que controla os estados `loading`, `error` e `ready`. Na inicialização, executa `repository.initialize()`, carrega `SharedPreferences` e o `DasReminderService`. Se `initialize()` falhar, exibe tela de erro com botão "Tentar novamente" (que chama `_initialize()` novamente, reutilizando a mesma instância do repositório). A falha no `refresh()` do DAS é tratada em `try/catch` separado e não bloqueia a abertura. |
+| `test/app/startup_screen_test.dart` | Novos testes com `sqflite_common_ffi` e banco temporário. O repositório é preparado no `setUp` (fora do `testWidgets`, para evitar problemas com fake async). Testa: falha no primeiro `initialize()` exibe orientação e botão de retry, retry abre os registros preservados; falha do DAS não impede a abertura. |
+
+### Como foi feito
+
+1. **Análise**: Identificado que o `main.dart` aguardava inicialização completa antes de `runApp()`. Se `repository.initialize()` lançasse exceção, o app quebrava antes de exibir qualquer UI.
+2. **Implementação**: Criada `StartupScreen` com ciclo de vida gerenciado por estados. Em `initState()` é chamada `_initialize(showLoading: false)`. Em caso de erro, `catch` atualiza estado para `error`. Retry chama `_initialize()` novamente com `showLoading: true`.
+3. **Testes**: Para evitar "did not complete"/timeout com `pumpAndSettle`, os testes pre-inicializam o banco no `setUp()` (fora do fake async). Foi criado um `_FailOnceRepository` que falha na primeira chamada e depois usa o `super.initialize()` já inicializado; para retornar `Future` concluído no teste, foi adicionado controle `ready` para evitar futures da zona real.
+4. **Validação**: `flutter analyze` sem problemas; `flutter test test/app/startup_screen_test.dart` passou (2 testes); suíte completa validada com `set TMPDIR=%TEMP%` (144 testes passaram).
+
+### PRs e histórico
+
+- PR #10: [T01: inicialização recuperável](https://github.com/Isaqueodev/NotaMei/pull/10) — mergeado em `main` pelo Pedro Isaque (merge commit `30417de`).
+- PR #11: [T01: inicialização recuperável (mensagens corrigidas)](https://github.com/Isaqueodev/NotaMei/pull/11) — aberto com mensagens de commit padronizadas (`feat: concluí a T01`, `docs: correção no nome`, `docs: Marquei a Task concluída`). Não mergeado (histórico do main não pode ser reescrito por regras do repositório).
+- Branch de desenvolvimento: `feat/t01-inicializacao-recuperavel` com commits reescritos.
+
+### Limitações
+
+- A base não é recriada nem limpa em caso de falha; o retry reutiliza a mesma instância de `EntryRepository`.
+- Falhas do DAS são não bloqueantes (tratadas separadamente).
+- A falha de 9 testes em `test/data/withdrawal_test.dart` no Windows sem `TMPDIR` é pré-existente (usa `Platform.environment['TMPDIR']!`) e não foi causada por esta alteração.
+
 ## Estado do projeto
 
 Esta versão cobre o fluxo local de apresentação, uso manual e **relatórios CSV/PDF**, acessíveis em Ajustes. **Backup/restauração próprios, sincronização, integrações externas e regras fiscais automáticas não estão implementados**. Relatórios não são restauráveis nem documentos fiscais. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
