@@ -123,18 +123,6 @@ A Tarefa T01 teve como objetivo tornar a inicialização do app resiliente: se a
 3. **Testes**: Para evitar "did not complete"/timeout com `pumpAndSettle`, os testes pre-inicializam o banco no `setUp()` (fora do fake async). Foi criado um `_FailOnceRepository` que falha na primeira chamada e depois usa o `super.initialize()` já inicializado; para retornar `Future` concluído no teste, foi adicionado controle `ready` para evitar futures da zona real.
 4. **Validação**: `flutter analyze` sem problemas; `flutter test test/app/startup_screen_test.dart` passou (2 testes); suíte completa validada com `set TMPDIR=%TEMP%` (144 testes passaram).
 
-### PRs e histórico
-
-- PR #10: [T01: inicialização recuperável](https://github.com/Isaqueodev/NotaMei/pull/10) — mergeado em `main` pelo Pedro Isaque (merge commit `30417de`).
-- PR #11: [T01: inicialização recuperável (mensagens corrigidas)](https://github.com/Isaqueodev/NotaMei/pull/11) — aberto com mensagens de commit padronizadas (`feat: concluí a T01`, `docs: correção no nome`, `docs: Marquei a Task concluída`). Não mergeado (histórico do main não pode ser reescrito por regras do repositório).
-- Branch de desenvolvimento: `feat/t01-inicializacao-recuperavel` com commits reescritos.
-
-### Limitações
-
-- A base não é recriada nem limpa em caso de falha; o retry reutiliza a mesma instância de `EntryRepository`.
-- Falhas do DAS são não bloqueantes (tratadas separadamente).
-- A falha de 9 testes em `test/data/withdrawal_test.dart` no Windows sem `TMPDIR` é pré-existente (usa `Platform.environment['TMPDIR']!`) e não foi causada por esta alteração.
-
 ## Estado do projeto
 
 Esta versão cobre o fluxo local de apresentação, uso manual e **relatórios CSV/PDF**, acessíveis em Ajustes. **Backup/restauração próprios, sincronização, integrações externas e regras fiscais automáticas não estão implementados**. Relatórios não são restauráveis nem documentos fiscais. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
