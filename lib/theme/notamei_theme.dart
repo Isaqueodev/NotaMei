@@ -2,29 +2,35 @@ import 'package:flutter/material.dart';
 
 /// Editorial B tokens. Legacy names remain aliases during the visual migration.
 abstract final class NotaMeiTheme {
-  static const ink = Color(0xFF1E1735);
-  static const paper = Color(0xFFFAF8F5);
-  static const muted = Color(0xFF615B6B);
-  static const border = Color(0xFFE5E0D8);
-  static const income = Color(0xFF28724B);
-  static const expense = Color(0xFFB23836);
-  static const incomeDark = Color(0xFFA9E4B7);
+  static const primary = Color(0xFF142D4E);
+  static const destaque = Color(0xFF28B889);
+  static const fundo = Color(0xFFF4F7FA);
+
+  static const ink = primary;
+  static const paper = fundo;
+  static const muted = Color(0xFF5F6B7A);
+  static const border = Color(0xFFDCE3EC);
+  static const income = Color(0xFF28B889);
+  static const expense = Color(0xFFD64545);
+  static const incomeDark = Color(0xFFA9F5D1);
   static const expenseDark = Color(0xFFFFB7AE);
-  static const clay = Color(0xFFA65D47);
-  static const purple = ink;
-  static const palePurple = paper;
-  static const mint = Color(0xFFEDF5EE);
+  static const clay = destaque;
+  static const purple = primary;
+  static const palePurple = fundo;
+  static const mint = Color(0xFFEFFAF6);
 
   static ThemeData get data {
     final scheme =
         ColorScheme.fromSeed(
-          seedColor: ink,
+          seedColor: primary,
           brightness: Brightness.light,
         ).copyWith(
-          primary: ink,
+          primary: primary,
           onPrimary: Colors.white,
+          secondary: destaque,
+          onSecondary: Colors.white,
           surface: Colors.white,
-          onSurface: ink,
+          onSurface: primary,
           onSurfaceVariant: muted,
           outline: border,
           error: expense,
@@ -33,56 +39,57 @@ abstract final class NotaMeiTheme {
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      fontFamily: 'Inter',
+      fontFamily: 'Roboto',
     );
+
     final text = base.textTheme.copyWith(
       headlineSmall: const TextStyle(
-        fontFamily: 'Playfair Display',
+        fontFamily: 'Roboto',
         fontSize: 26,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         height: 1.2,
-        color: ink,
+        color: primary,
       ),
       headlineMedium: const TextStyle(
-        fontFamily: 'Playfair Display',
+        fontFamily: 'Roboto',
         fontSize: 32,
         fontWeight: FontWeight.w700,
         height: 1.15,
-        color: ink,
+        color: primary,
       ),
       titleLarge: const TextStyle(
-        fontFamily: 'Playfair Display',
+        fontFamily: 'Roboto',
         fontSize: 22,
         fontWeight: FontWeight.w600,
         height: 1.25,
-        color: ink,
+        color: primary,
       ),
       titleMedium: const TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Roboto',
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: ink,
+        color: primary,
       ),
       bodyLarge: const TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Roboto',
         fontSize: 16,
         height: 1.45,
-        color: ink,
+        color: primary,
       ),
       bodyMedium: const TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Roboto',
         fontSize: 14,
         height: 1.45,
-        color: ink,
+        color: primary,
       ),
       bodySmall: const TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 14,
+        fontFamily: 'Roboto',
+        fontSize: 13,
         height: 1.35,
         color: muted,
       ),
       labelLarge: const TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Roboto',
         fontSize: 14,
         fontWeight: FontWeight.w600,
       ),
@@ -90,99 +97,16 @@ abstract final class NotaMeiTheme {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     );
+
     return base.copyWith(
       textTheme: text,
-      scaffoldBackgroundColor: paper,
-      appBarTheme: AppBarTheme(
-        backgroundColor: paper,
-        foregroundColor: ink,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        titleTextStyle: text.titleLarge,
-      ),
-      cardTheme: CardThemeData(
-        color: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: border),
-        ),
-      ),
-      dividerTheme: const DividerThemeData(
-        color: border,
-        thickness: 1,
-        space: 1,
-      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: ink,
+          backgroundColor: destaque,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(48),
           shape: shape,
           textStyle: text.labelLarge,
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: ink,
-          minimumSize: const Size.fromHeight(48),
-          side: const BorderSide(color: ink),
-          shape: shape,
-          textStyle: text.labelLarge,
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          minimumSize: const Size(48, 48),
-          textStyle: text.labelLarge,
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        backgroundColor: paper,
-        selectedColor: ink,
-        secondarySelectedColor: ink,
-        side: const BorderSide(color: border),
-        shape: shape,
-        labelStyle: text.labelLarge,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: border),
-        ),
-        contentPadding: const EdgeInsets.all(16),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: paper,
-        elevation: 0,
-        height: 76,
-        labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 14,
-            fontWeight: states.contains(WidgetState.selected)
-                ? FontWeight.w600
-                : FontWeight.w400,
-            color: states.contains(WidgetState.selected) ? ink : muted,
-          ),
-        ),
-        iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(
-            color: states.contains(WidgetState.selected) ? ink : muted,
-          ),
         ),
       ),
     );
