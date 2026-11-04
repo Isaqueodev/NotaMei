@@ -77,7 +77,9 @@ class _StartupScreenState extends State<StartupScreen> {
       case _StartupStage.loading:
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: NotaMeiTheme.data,
+          theme: NotaMeiTheme.light(),
+          darkTheme: NotaMeiTheme.dark(),
+          themeMode: ThemeMode.system,
           home: const Scaffold(
             body: Center(
               child: CircularProgressIndicator(key: Key('startup-loading')),
@@ -87,7 +89,9 @@ class _StartupScreenState extends State<StartupScreen> {
       case _StartupStage.error:
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: NotaMeiTheme.data,
+          theme: NotaMeiTheme.light(),
+          darkTheme: NotaMeiTheme.dark(),
+          themeMode: ThemeMode.system,
           home: Scaffold(
             body: SafeArea(
               child: Center(

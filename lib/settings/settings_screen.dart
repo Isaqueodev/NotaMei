@@ -10,6 +10,8 @@ class SettingsScreen extends StatelessWidget {
     this.reminderWarning,
     this.onExportCsv,
     this.onExportPdf,
+    this.themeMode = ThemeMode.system,
+    this.onThemeModeChanged,
   });
 
   final VoidCallback? onExportCsv;
@@ -18,6 +20,8 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback onConfigureDas;
   final bool dasEnabled;
   final String? reminderWarning;
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode>? onThemeModeChanged;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -40,6 +44,15 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
           ],
+                    const _SectionTitle('Aparência'),
+          _Sheet(
+            child: _ThemeModeRow(
+              themeMode: themeMode,
+              onChanged: onThemeModeChanged,
+            ),
+          ),
+          const SizedBox(height: 24),
+
           const _SectionTitle('Ações e segurança'),
           _Sheet(
             child: Column(
@@ -259,4 +272,72 @@ class _Notice extends StatelessWidget {
           ?.copyWith(color: isError ? NotaMeiTheme.expense : NotaMeiTheme.ink),
     ),
   );
+}
+
+class _ThemeModeRow extends StatelessWidget {
+  const _ThemeModeRow({
+    required this.themeMode,
+    this.onChanged,
+  });
+
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.brightness_6_outlined,
+            color: Theme.of(context).colorScheme.onSurface,
+            size: 22,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tema',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Seguir sistema, claro ou escuro',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          DropdownButton<ThemeMode>(
+            value: themeMode,
+            onChanged: onChanged == null
+                ? null
+                : (value) {
+                    if (value != null) {
+                      onChanged!(value);
+                    }
+                  },
+            items: const [
+              DropdownMenuItem(
+                value: ThemeMode.system,
+                child: Text('Sistema'),
+              ),
+              DropdownMenuItem(
+                value: ThemeMode.light,
+                child: Text('Claro'),
+              ),
+              DropdownMenuItem(
+                value: ThemeMode.dark,
+                child: Text('Escuro'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

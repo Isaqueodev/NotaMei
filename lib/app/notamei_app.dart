@@ -38,6 +38,38 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
   late bool _completed =
       widget.preferences.getBool('onboarding_completed') ?? false;
   int _tab = 0;
+  late ThemeMode _themeMode = _loadThemeMode();
+
+  ThemeMode _loadThemeMode() {
+    final value = widget.preferences.getString('theme_mode');
+    switch (value) {
+      case 'dark':
+        return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  Future<void> _setThemeMode(ThemeMode mode) async {
+    setState(() => _themeMode = mode);
+    String value;
+    switch (mode) {
+      case ThemeMode.dark:
+        value = 'dark';
+        break;
+      case ThemeMode.light:
+        value = 'light';
+        break;
+      case ThemeMode.system:
+        value = 'system';
+        break;
+    }
+    await widget.preferences.setString('theme_mode', value);
+  }
+
 
   Future<void> _finishFirstTour({bool openEntry = false}) async {
     await widget.preferences.setBool('onboarding_completed', true);
@@ -102,12 +134,14 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
     );
   }
 
-  @override
+   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'NotaMei',
     debugShowCheckedModeBanner: false,
     navigatorKey: _navigatorKey,
-    theme: NotaMeiTheme.data,
+    theme: NotaMeiTheme.light(),
+    darkTheme: NotaMeiTheme.dark(),
+    themeMode: _themeMode,
     locale: const Locale('pt', 'BR'),
     supportedLocales: const [Locale('pt', 'BR')],
     localizationsDelegates: GlobalMaterialLocalizations.delegates,
@@ -146,6 +180,8 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
           onConfigureDas: _openDas,
           dasEnabled: widget.dasService.enabled,
           reminderWarning: widget.reminderWarning,
+          themeMode: _themeMode,
+          onThemeModeChanged: _setThemeMode,
         ),
       ],
     ),
