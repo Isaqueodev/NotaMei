@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../core/money.dart';
 import '../data/entry_record.dart';
@@ -44,24 +44,24 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
 
   final List<String> _businessIncomeCategories = [
     'Vendas',
-    'Serviços Prestados',
-    'Comissões',
+    'ServiÃ§os Prestados',
+    'ComissÃµes',
     'Outras Receitas',
   ];
 
   final List<String> _businessExpenseCategories = [
-    'Mercadorias / Matéria-prima',
-    'Aluguel / Água / Luz',
+    'Mercadorias / MatÃ©ria-prima',
+    'Aluguel / Ãgua / Luz',
     'Impostos / Taxas (DAS)',
-    'Marketing / Divulgação',
+    'Marketing / DivulgaÃ§Ã£o',
     'Outras Despesas',
   ];
 
   final List<String> _personalCategories = [
-    'Alimentação',
+    'AlimentaÃ§Ã£o',
     'Moradia',
     'Transporte',
-    'Saúde / Lazer',
+    'SaÃºde / Lazer',
     'Outros Pessoais',
   ];
 
@@ -116,7 +116,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
       _savedForAnother = false;
       final text = _amountController.text.trim();
       if (text.isEmpty) {
-        _amountError = 'Informe o valor do lançamento';
+        _amountError = 'Informe o valor do lanÃ§amento';
       } else {
         try {
           parseMoney(text);
@@ -183,7 +183,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _saveError = 'Não foi possível salvar o lançamento. Revise o valor e tente novamente.';
+          _saveError = 'NÃ£o foi possÃ­vel salvar o lanÃ§amento. Revise o valor e tente novamente.';
           _saving = false;
         });
         _revealError();
@@ -205,9 +205,9 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir Lançamento'),
+        title: const Text('Excluir LanÃ§amento'),
         content: const Text(
-          'Tem certeza de que deseja excluir este lançamento? Esta ação não poderá ser desfeita.',
+          'Tem certeza de que deseja excluir este lanÃ§amento? Esta aÃ§Ã£o nÃ£o poderÃ¡ ser desfeita.',
         ),
         actions: [
           TextButton(
@@ -217,7 +217,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: NotaMeiTheme.expense,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Excluir'),
@@ -243,7 +243,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
         if (mounted) {
           setState(() {
             _saveError =
-                'Não foi possível excluir o lançamento. Tente novamente.';
+                'NÃ£o foi possÃ­vel excluir o lanÃ§amento. Tente novamente.';
             _saving = false;
           });
           _revealError();
@@ -284,9 +284,9 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
     return PopScope(
       canPop: !_saving,
       child: Scaffold(
-        backgroundColor: NotaMeiTheme.paper,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text(isEditing ? 'Editar Lançamento' : 'Novo Lançamento'),
+          title: Text(isEditing ? 'Editar LanÃ§amento' : 'Novo LanÃ§amento'),
           actions: [
             if (isEditing)
               IconButton(
@@ -294,7 +294,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                   Icons.delete_outline,
                   color: NotaMeiTheme.expense,
                 ),
-                tooltip: 'Excluir Lançamento',
+                tooltip: 'Excluir LanÃ§amento',
                 onPressed: _saving ? null : _confirmDelete,
               ),
           ],
@@ -324,7 +324,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                             ),
                           ),
                         ),
-                      _label('Tipo de movimentação'),
+                      _label('Tipo de movimentaÃ§Ã£o'),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
@@ -338,7 +338,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                             ),
                             (
                               EntryType.expense,
-                              'Despesa (Saída)',
+                              'Despesa (SaÃ­da)',
                               NotaMeiTheme.expense,
                             ),
                           ])
@@ -346,7 +346,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                               label: Text(option.$2),
                               selected: _type == option.$1,
                               selectedColor: option.$3,
-                              checkmarkColor: Colors.white,
+                              checkmarkColor: Theme.of(context).colorScheme.onPrimary,
                               labelStyle: TextStyle(
                                 color: _type == option.$1
                                     ? Colors.white
@@ -367,7 +367,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      _label('Âmbito do lançamento'),
+                      _label('Ã‚mbito do lanÃ§amento'),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -375,9 +375,9 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: NotaMeiTheme.border),
+                          border: Border.all(color: Theme.of(context).colorScheme.outline),
                         ),
                         child: DropdownButton<EntryScope>(
                           value: _scope,
@@ -386,7 +386,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                           items: const [
                             DropdownMenuItem(
                               value: EntryScope.business,
-                              child: Text('Negócio'),
+                              child: Text('NegÃ³cio'),
                             ),
                             DropdownMenuItem(
                               value: EntryScope.personal,
@@ -412,10 +412,10 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                       const SizedBox(height: 8),
                       Text(
                         _scope == EntryScope.business
-                            ? 'Entra no resumo do negócio'
-                            : 'Isolado do negócio (Pessoal)',
-                        style: const TextStyle(
-                          color: NotaMeiTheme.muted,
+                            ? 'Entra no resumo do negÃ³cio'
+                            : 'Isolado do negÃ³cio (Pessoal)',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -441,11 +441,11 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                           errorText: _amountError,
                           errorMaxLines: 4,
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).colorScheme.surface,
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: NotaMeiTheme.border,
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
                             ),
                           ),
                         ),
@@ -453,8 +453,8 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                       const SizedBox(height: 8),
                       Text(
                         _type == EntryType.income
-                            ? 'Entrada manual a ser somada no balanço'
-                            : 'Saída manual a ser descontada do balanço',
+                            ? 'Entrada manual a ser somada no balanÃ§o'
+                            : 'SaÃ­da manual a ser descontada do balanÃ§o',
                         style: TextStyle(color: typeColor, fontSize: 14),
                       ),
                       const SizedBox(height: 24),
@@ -471,7 +471,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                           errorText: _categoryError,
                           errorMaxLines: 3,
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).colorScheme.surface,
                         ),
                         items: _currentCategories
                             .map(
@@ -502,29 +502,29 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                         label: Text(formatShortDate(_date)),
                         style: OutlinedButton.styleFrom(
                           alignment: Alignment.centerLeft,
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: NotaMeiTheme.border),
+                          backgroundColor: Theme.of(context).colorScheme.surface,
+                          side: BorderSide(color: Theme.of(context).colorScheme.outline),
                           padding: const EdgeInsets.all(16),
                         ),
                       ),
                       const SizedBox(height: 24),
-                      _label('Anotação (Opcional)'),
+                      _label('AnotaÃ§Ã£o (Opcional)'),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _noteController,
                         readOnly: _saving,
                         maxLines: 3,
-                        decoration: const InputDecoration(
-                          hintText: 'Adicione uma observação, se desejar',
+                        decoration: InputDecoration(
+                          hintText: 'Adicione uma observaÃ§Ã£o, se desejar',
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Theme.of(context).colorScheme.surface,
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Registro manual e local. Não é uma declaração fiscal.',
+                      Text(
+                        'Registro manual e local. NÃ£o Ã© uma declaraÃ§Ã£o fiscal.',
                         style: TextStyle(
-                          color: NotaMeiTheme.muted,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -534,9 +534,9 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
               ),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  border: Border(top: BorderSide(color: NotaMeiTheme.border)),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outline)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -548,7 +548,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                         child: Semantics(
                           liveRegion: true,
                           child: Text(
-                            'Lançamento salvo. Você pode adicionar outro.',
+                            'LanÃ§amento salvo. VocÃª pode adicionar outro.',
                             style: TextStyle(
                               color: NotaMeiTheme.income,
                               fontSize: 14,
@@ -559,8 +559,8 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                     ElevatedButton(
                       onPressed: _saving ? null : _save,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: NotaMeiTheme.ink,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         elevation: 0,
                         minimumSize: const Size.fromHeight(48),
                         padding: const EdgeInsets.all(16),
@@ -570,8 +570,8 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                       ),
                       child: Text(
                         isEditing
-                            ? 'Salvar Alterações'
-                            : 'Adicionar Lançamento',
+                            ? 'Salvar AlteraÃ§Ãµes'
+                            : 'Adicionar LanÃ§amento',
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -603,10 +603,11 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
 
   Widget _label(String text) => Text(
     text,
-    style: const TextStyle(
-      color: NotaMeiTheme.ink,
+    style: TextStyle(
+      color: Theme.of(context).colorScheme.onSurface,
       fontSize: 14,
       fontWeight: FontWeight.w600,
     ),
   );
 }
+

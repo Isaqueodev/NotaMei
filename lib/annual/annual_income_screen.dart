@@ -36,7 +36,7 @@ class AnnualIncomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final summary = recordedAnnualIncome(entries, year);
     return Scaffold(
-      backgroundColor: NotaMeiTheme.paper,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(title: const Text('Acompanhamento anual')),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -56,10 +56,10 @@ class AnnualIncomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
+                        Text(
                           'TOTAL DE ENTRADAS · NEGÓCIO',
                           style: TextStyle(
-                            color: NotaMeiTheme.muted,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 14,
                           ),
                         ),
@@ -83,15 +83,15 @@ class AnnualIncomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 '—: sem entrada informada; movimento não confirmado',
-                style: TextStyle(color: NotaMeiTheme.muted, fontSize: 14),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
               ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: NotaMeiTheme.border),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(

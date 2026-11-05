@@ -84,7 +84,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ..sort((a, b) => b.date.compareTo(a.date));
     final displayEntries = recentEntries.take(5).toList();
     return Scaffold(
-      backgroundColor: NotaMeiTheme.paper,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -98,10 +98,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   excludeFromSemantics: true,
                 ),
                 const SizedBox(width: 10),
-                const Text(
+                Text(
                   'NotaMei',
                   style: TextStyle(
-                    color: NotaMeiTheme.ink,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
@@ -127,9 +127,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ChoiceChip(
                     label: Text(option.$1),
                     selected: _scope == option.$2,
-                    selectedColor: NotaMeiTheme.ink,
-                    checkmarkColor: Colors.white,
-                    labelStyle: editorialChipLabel(_scope == option.$2),
+                    selectedColor: Theme.of(context).colorScheme.primary,
+                    checkmarkColor: Theme.of(context).colorScheme.onPrimary,
+                    labelStyle: editorialChipLabel(context, _scope == option.$2),
                     onSelected: (_) => setState(() => _scope = option.$2),
                   ),
               ],
@@ -139,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               key: const Key('monthly-summary'),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: NotaMeiTheme.ink,
+                color: Theme.of(context).colorScheme.onSurface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -147,27 +147,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     summaryTitle,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     totalsOverflow ? '—' : formatMoney(summary.balanceCents),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Playfair Display',
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   if (_scope == null) ...[
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Negócio + Pessoal. Total geral dos registros informados.',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 14),
                     ),
                   ],
                   const SizedBox(height: 20),
-                  const Divider(color: NotaMeiTheme.muted),
+                  Divider(color: Theme.of(context).colorScheme.onPrimary.withAlpha(120)),
                   const SizedBox(height: 16),
                   LayoutBuilder(
                     builder: (context, constraints) {
@@ -205,9 +205,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.only(left: 12),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 border: Border(
-                                  left: BorderSide(color: NotaMeiTheme.muted),
+                                  left: BorderSide(color: Theme.of(context).colorScheme.onPrimary.withAlpha(120)),
                                 ),
                               ),
                               child: items[1],
@@ -223,7 +223,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Retiradas para você',
                       totalsOverflow ? '—' : formatMoney(summary.sentCents),
                       Icons.arrow_forward,
-                      Colors.white,
+                      Theme.of(context).colorScheme.onPrimary,
                     ),
                   ],
                   if (_scope != EntryScope.business) ...[
@@ -232,13 +232,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Recebido do negócio',
                       totalsOverflow ? '—' : formatMoney(summary.receivedCents),
                       Icons.arrow_back,
-                      Colors.white,
+                      Theme.of(context).colorScheme.onPrimary,
                     ),
                   ],
                   if (_scope == null)
-                    const Text(
+                    Text(
                       'Movimentações internas não entram nos totais gerais de entradas, saídas ou balanço.',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                     ),
                 ],
               ),
@@ -256,8 +256,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               icon: const Icon(Icons.add),
               label: const Text('Novo Lançamento'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: NotaMeiTheme.ink,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 elevation: 0,
                 minimumSize: const Size.fromHeight(48),
                 padding: const EdgeInsets.all(16),
@@ -303,9 +303,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.edit_note,
-                          color: NotaMeiTheme.muted,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           size: 32,
                         ),
                         const SizedBox(height: 12),
@@ -323,8 +323,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ? 'Nenhum lançamento pessoal neste mês. Você pode registrar uma entrada ou saída pessoal.'
                               : 'Use Novo Lançamento acima para registrar uma entrada ou saída${_scope == EntryScope.business ? ' do negócio' : ''}.',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: NotaMeiTheme.muted,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 14,
                           ),
                         ),
@@ -349,9 +349,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Registros manuais e locais. Balanço considera entradas e saídas comuns e, por âmbito, retiradas enviadas/recebidas. Em Todos, movimentações internas são excluídas.',
-              style: TextStyle(color: NotaMeiTheme.muted, fontSize: 14),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
             ),
           ],
         ),
