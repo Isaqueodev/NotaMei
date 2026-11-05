@@ -29,7 +29,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       if (!didPop && _page > 0) _moveTo(_page - 1);
     },
     child: Scaffold(
-      backgroundColor: NotaMeiTheme.paper,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: AnimatedSwitcher(
           duration: MediaQuery.disableAnimationsOf(context)
@@ -361,13 +361,13 @@ class _Progress extends StatelessWidget {
         child: Text(
           '${page + 1}/3',
           style: Theme.of(context).textTheme.labelLarge
-              ?.copyWith(color: NotaMeiTheme.muted),
+              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       ),
       const SizedBox(height: 8),
       LinearProgressIndicator(
         value: (page + 1) / 3,
-        color: NotaMeiTheme.ink,
+        color: Theme.of(context).colorScheme.onSurface,
         backgroundColor: NotaMeiTheme.border,
         minHeight: 3,
       ),
@@ -380,13 +380,13 @@ class _Sheet extends StatelessWidget {
   final List<Widget> children;
   @override
   Widget build(BuildContext context) => Card(
-    color: Colors.white,
+    color: Theme.of(context).colorScheme.surface,
     elevation: 0,
     surfaceTintColor: Colors.transparent,
     margin: EdgeInsets.zero,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: NotaMeiTheme.border),
+      side: BorderSide(color: Theme.of(context).colorScheme.outline),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -413,7 +413,7 @@ class _InfoRow extends StatelessWidget {
         Text(
           number,
           style: Theme.of(context).textTheme.labelLarge
-              ?.copyWith(color: NotaMeiTheme.muted),
+              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -511,8 +511,8 @@ class _Tip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-    decoration: const BoxDecoration(
-      border: Border(left: BorderSide(color: NotaMeiTheme.ink, width: 2)),
+    decoration: BoxDecoration(
+      border: Border(left: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 2)),
     ),
     child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
   );

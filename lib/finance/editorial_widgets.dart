@@ -13,8 +13,8 @@ class LedgerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border.all(color: NotaMeiTheme.border),
+      color: Theme.of(context).colorScheme.surface,
+      border: Border.all(color: Theme.of(context).colorScheme.outline),
       borderRadius: BorderRadius.circular(12),
     ),
     clipBehavior: Clip.antiAlias,
@@ -51,13 +51,13 @@ class LedgerEntry extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           '${entry.scope == EntryScope.business ? 'Negócio' : 'Pessoal'} · ${formatShortDate(entry.date)}',
-          style: const TextStyle(color: NotaMeiTheme.muted, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
         ),
         if (entry.note?.isNotEmpty ?? false) ...[
           const SizedBox(height: 4),
           Text(
             entry.note!,
-            style: const TextStyle(color: NotaMeiTheme.muted, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
           ),
         ],
       ],
@@ -106,9 +106,9 @@ class LedgerEntry extends StatelessWidget {
                   const SizedBox(width: 16),
                   Expanded(flex: 4, child: amount),
                   if (onTap != null)
-                    const Icon(
+                    Icon(
                       Icons.chevron_right,
-                      color: NotaMeiTheme.muted,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                 ],
@@ -156,8 +156,10 @@ class EditorialMonthSelector extends StatelessWidget {
   );
 }
 
-TextStyle editorialChipLabel(bool selected) => TextStyle(
-  color: selected ? Colors.white : NotaMeiTheme.ink,
+TextStyle editorialChipLabel(BuildContext context, bool selected) => TextStyle(
+  color: selected
+      ? Theme.of(context).colorScheme.onPrimary
+      : Theme.of(context).colorScheme.onSurface,
   fontSize: 14,
   fontWeight: FontWeight.w600,
 );

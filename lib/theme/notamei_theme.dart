@@ -50,25 +50,45 @@ abstract final class NotaMeiTheme {
       surfaceTint: Colors.transparent,
     );
     final base = ThemeData(useMaterial3: true, colorScheme: scheme, fontFamily: 'Roboto');
-    // ... mesmo textTheme/filledButtonTheme de hoje, usando cores claras ...
-    final text = base.textTheme.copyWith(
-      // mantenha cores como primary/muted conforme hoje
+        final text = base.textTheme.copyWith(
+      headlineSmall: const TextStyle(fontFamily: 'Roboto', fontSize: 26, fontWeight: FontWeight.w700, height: 1.2, color: primary),
+      headlineMedium: const TextStyle(fontFamily: 'Roboto', fontSize: 32, fontWeight: FontWeight.w700, height: 1.15, color: primary),
+      titleLarge: const TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w600, height: 1.25, color: primary),
+      titleMedium: const TextStyle(fontFamily: 'Roboto', fontSize: 16, fontWeight: FontWeight.w600, color: primary),
+      bodyLarge: const TextStyle(fontFamily: 'Roboto', fontSize: 16, height: 1.45, color: primary),
+      bodyMedium: const TextStyle(fontFamily: 'Roboto', fontSize: 14, height: 1.45, color: primary),
+      bodySmall: const TextStyle(fontFamily: 'Roboto', fontSize: 13, height: 1.35, color: muted),
+      labelLarge: const TextStyle(fontFamily: 'Roboto', fontSize: 14, fontWeight: FontWeight.w600),
     );
     final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(8));
     return base.copyWith(
       scaffoldBackgroundColor: fundo,
       textTheme: text,
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: destaque,
-          foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(48),
-          shape: shape,
-          textStyle: text.labelLarge,
-        ),
+      cardTheme: CardThemeData(
+      color: Colors.white,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: border),
       ),
-    );
-  }
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.white,
+      foregroundColor: primary,
+      surfaceTintColor: Colors.transparent,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: destaque,
+        foregroundColor: Colors.white,
+        minimumSize: const Size.fromHeight(48),
+        shape: shape,
+        textStyle: text.labelLarge,
+      ),
+    ),
+  );
+}
 
   static ThemeData dark() {
     final scheme = ColorScheme.fromSeed(
@@ -102,6 +122,22 @@ abstract final class NotaMeiTheme {
     return base.copyWith(
       scaffoldBackgroundColor: backgroundDark,
       textTheme: text,
+      cardTheme: CardThemeData(
+        color: surfaceDark,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: borderDark),
+        ),
+      ),
+
+      appBarTheme: const AppBarTheme(
+        backgroundColor: surfaceDark,
+        foregroundColor: onSurfaceDark,
+        surfaceTintColor: Colors.transparent,
+      ),
+
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: destaqueDark,

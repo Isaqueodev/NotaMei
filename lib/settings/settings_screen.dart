@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:notamei/theme/notamei_theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -25,26 +25,27 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: NotaMeiTheme.paper,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     appBar: AppBar(title: const Text('Ajustes')),
     body: SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           Text(
-            'CONFIGURAÇÕES LOCAIS',
-            style: Theme.of(context).textTheme.labelLarge
-                ?.copyWith(color: NotaMeiTheme.muted),
+            'CONFIGURAÃ‡Ã•ES LOCAIS',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+             color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
-          const SizedBox(height: 24),
-          if (reminderWarning != null) ...[
-            Semantics(
+            const SizedBox(height: 24),
+            if (reminderWarning != null) ...[
+              Semantics(
               liveRegion: true,
               child: _Notice(text: reminderWarning!, isError: true),
             ),
-            const SizedBox(height: 16),
-          ],
-                    const _SectionTitle('Aparência'),
+              const SizedBox(height: 16),
+            ],
+                    const _SectionTitle('AparÃªncia'),
           _Sheet(
             child: _ThemeModeRow(
               themeMode: themeMode,
@@ -53,7 +54,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          const _SectionTitle('Ações e segurança'),
+          const _SectionTitle('AÃ§Ãµes e seguranÃ§a'),
           _Sheet(
             child: Column(
               children: [
@@ -85,7 +86,7 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.file_download_outlined,
                 title: 'Exportar CSV',
                 subtitle:
-                    'Escolha período e filtros para salvar ou compartilhar.',
+                    'Escolha perÃ­odo e filtros para salvar ou compartilhar.',
                 onTap: onExportCsv,
               ),
             ),
@@ -97,7 +98,7 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.picture_as_pdf_outlined,
                 title: 'Exportar PDF',
                 subtitle:
-                    'Relatório para leitura, com os mesmos períodos e filtros.',
+                    'RelatÃ³rio para leitura, com os mesmos perÃ­odos e filtros.',
                 onTap: onExportPdf,
               ),
             ),
@@ -107,16 +108,16 @@ class SettingsScreen extends StatelessWidget {
             child: _SettingRow(
               icon: Icons.phone_android,
               title: 'Dados salvos no aparelho',
-              subtitle: 'O app não oferece sincronização própria; cópias do sistema dependem das suas configurações.',
+              subtitle: 'O app nÃ£o oferece sincronizaÃ§Ã£o prÃ³pria; cÃ³pias do sistema dependem das suas configuraÃ§Ãµes.',
             ),
           ),
           const SizedBox(height: 12),
           const _Notice(
-            text: 'Limpar os dados ou desinstalar o app pode apagar seu histórico. Não há backup próprio nem restauração pelo NotaMei nesta versão.',
+            text: 'Limpar os dados ou desinstalar o app pode apagar seu histÃ³rico. NÃ£o hÃ¡ backup prÃ³prio nem restauraÃ§Ã£o pelo NotaMei nesta versÃ£o.',
           ),
           const SizedBox(height: 12),
           const _Notice(
-            text: 'O NotaMei não confirma pagamento. Use os canais oficiais para verificar o DAS e seus comprovantes.',
+            text: 'O NotaMei nÃ£o confirma pagamento. Use os canais oficiais para verificar o DAS e seus comprovantes.',
           ),
           const SizedBox(height: 24),
           const _SectionTitle('Sobre o NotaMei'),
@@ -140,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Caderno de registro manual para MEI. Entradas, saídas e acompanhamento dos valores informados. Sem vínculo bancário ou validação fiscal.',
+                    'Caderno de registro manual para MEI. Entradas, saÃ­das e acompanhamento dos valores informados. Sem vÃ­nculo bancÃ¡rio ou validaÃ§Ã£o fiscal.',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
@@ -161,9 +162,10 @@ class _SectionTitle extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 12),
     child: Text(
       text,
-      style: Theme.of(context).textTheme.labelLarge
-          ?.copyWith(color: NotaMeiTheme.muted),
-    ),
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    )
   );
 }
 
@@ -172,13 +174,13 @@ class _Sheet extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) => Card(
-    color: Colors.white,
+    color: Theme.of(context).colorScheme.surface,
     elevation: 0,
     surfaceTintColor: Colors.transparent,
     margin: EdgeInsets.zero,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: NotaMeiTheme.border),
+      side: BorderSide(color: Theme.of(context).colorScheme.outline),
     ),
     child: child,
   );
@@ -207,7 +209,7 @@ class _SettingRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: NotaMeiTheme.ink, size: 22),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -220,8 +222,8 @@ class _SettingRow extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     status!,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: active ? NotaMeiTheme.income : NotaMeiTheme.muted,
+  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+    color: active ? NotaMeiTheme.income : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -230,9 +232,9 @@ class _SettingRow extends StatelessWidget {
           ),
           if (onTap != null) ...[
             const SizedBox(width: 8),
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: NotaMeiTheme.muted,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               size: 20,
             ),
           ],
@@ -261,7 +263,7 @@ class _Notice extends StatelessWidget {
     decoration: BoxDecoration(
       border: Border(
         left: BorderSide(
-          color: isError ? NotaMeiTheme.expense : NotaMeiTheme.ink,
+          color: isError ? NotaMeiTheme.expense : Theme.of(context).colorScheme.onSurfaceVariant,
           width: 2,
         ),
       ),
@@ -269,7 +271,7 @@ class _Notice extends StatelessWidget {
     child: Text(
       text,
       style: Theme.of(context).textTheme.bodyMedium
-          ?.copyWith(color: isError ? NotaMeiTheme.expense : NotaMeiTheme.ink),
+          ?.copyWith(color: isError ? NotaMeiTheme.expense : Theme.of(context).colorScheme.onSurfaceVariant),
     ),
   );
 }
@@ -306,34 +308,20 @@ class _ThemeModeRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Seguir sistema, claro ou escuro',
+                  'Alternar entre claro e escuro',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
           ),
           DropdownButton<ThemeMode>(
-            value: themeMode,
-            onChanged: onChanged == null
-                ? null
-                : (value) {
-                    if (value != null) {
-                      onChanged!(value);
-                    }
-                  },
+            value: themeMode == ThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
+            onChanged: onChanged == null ? null : (value) {
+            if (value != null) onChanged!(value);
+            },
             items: const [
-              DropdownMenuItem(
-                value: ThemeMode.system,
-                child: Text('Sistema'),
-              ),
-              DropdownMenuItem(
-                value: ThemeMode.light,
-                child: Text('Claro'),
-              ),
-              DropdownMenuItem(
-                value: ThemeMode.dark,
-                child: Text('Escuro'),
-              ),
+              DropdownMenuItem(value: ThemeMode.light, child: Text('Claro')),
+              DropdownMenuItem(value: ThemeMode.dark, child: Text('Escuro')),
             ],
           ),
         ],

@@ -43,15 +43,14 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
   ThemeMode _loadThemeMode() {
     final value = widget.preferences.getString('theme_mode');
     switch (value) {
-      case 'dark':
-        return ThemeMode.dark;
-      case 'light':
-        return ThemeMode.light;
-      case 'system':
-      default:
-        return ThemeMode.system;
-    }
+    case 'dark':
+      return ThemeMode.dark;
+    case 'light':
+    case 'system':
+    default:
+      return ThemeMode.light; // padrão claro
   }
+}
 
   Future<void> _setThemeMode(ThemeMode mode) async {
     setState(() => _themeMode = mode);

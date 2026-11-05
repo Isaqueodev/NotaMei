@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
@@ -66,8 +66,8 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
             .toList()
           ..sort((a, b) => b.date.compareTo(a.date));
     return Scaffold(
-      backgroundColor: NotaMeiTheme.paper,
-      appBar: AppBar(title: const Text('Histórico')),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(title: const Text('HistÃ³rico')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -78,7 +78,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
               onNext: () => _changeMonth(1),
             ),
             const SizedBox(height: 20),
-            const Text('Âmbito', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('Ã‚mbito', style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -92,7 +92,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                   }),
                 ),
                 _chip(
-                  'Negócio',
+                  'NegÃ³cio',
                   _scopeFilter == EntryScope.business,
                   (selected) => setState(
                     () => _scopeFilter = selected ? EntryScope.business : null,
@@ -123,7 +123,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                   color: NotaMeiTheme.income,
                 ),
                 _chip(
-                  'Saídas',
+                  'SaÃ­das',
                   _typeFilter == EntryType.expense,
                   (selected) => setState(
                     () => _typeFilter = selected ? EntryType.expense : null,
@@ -135,25 +135,25 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
             const SizedBox(height: 24),
             Text(
               '${filteredEntries.length} registros',
-              style: const TextStyle(color: NotaMeiTheme.muted),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 12),
             LedgerSheet(
               key: const Key('history-ledger'),
               children: [
                 if (filteredEntries.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(24),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
                         Icon(
                           Icons.history_edu,
                           size: 32,
-                          color: NotaMeiTheme.muted,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Nenhum lançamento encontrado',
+                          'Nenhum lanÃ§amento encontrado',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -162,7 +162,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Tente mudar os filtros ou o mês selecionado.',
+                          'Tente mudar os filtros ou o mÃªs selecionado.',
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -182,13 +182,14 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
     String label,
     bool selected,
     ValueChanged<bool> onSelected, {
-    Color color = NotaMeiTheme.ink,
+    Color? color,
   }) => FilterChip(
     label: Text(label),
     selected: selected,
     onSelected: onSelected,
-    selectedColor: color,
-    checkmarkColor: Colors.white,
-    labelStyle: editorialChipLabel(selected),
+    selectedColor: color ?? Theme.of(context).colorScheme.primary,
+    checkmarkColor: Theme.of(context).colorScheme.onPrimary,
+    labelStyle: editorialChipLabel(context, selected),
   );
 }
+
