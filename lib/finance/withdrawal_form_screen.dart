@@ -149,7 +149,7 @@ class _WithdrawalFormScreenState extends State<WithdrawalFormScreen> {
   Widget build(BuildContext context) => PopScope(
     canPop: !_saving,
     child: Scaffold(
-      backgroundColor: NotaMeiTheme.paper,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           _saving
