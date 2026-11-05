@@ -115,10 +115,10 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
               data: Theme.of(context).copyWith(
                 timePickerTheme: TimePickerTheme.of(context).copyWith(
                   elevation: 0,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: NotaMeiTheme.border),
+                    side: BorderSide(color: Theme.of(context).colorScheme.outline),
                   ),
                 ),
               ),
@@ -139,7 +139,7 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
       _FeedbackKind.information => NotaMeiTheme.ink,
     };
     return Scaffold(
-      backgroundColor: NotaMeiTheme.paper,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(title: const Text('Lembrete do DAS')),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -154,7 +154,7 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
                     Text(
                       'ESTADO DO AVISO',
                       style: theme.textTheme.labelLarge?.copyWith(
-                        color: NotaMeiTheme.muted,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -206,7 +206,7 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
                     DropdownButtonFormField<int>(
                       initialValue: _day,
                       elevation: 0,
-                      dropdownColor: Colors.white,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(8),
                       isExpanded: true,
                       isDense: false,
@@ -277,9 +277,9 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
               ],
               if (_busy) ...[
                 const SizedBox(height: 12),
-                const LinearProgressIndicator(
+                LinearProgressIndicator(
                   semanticsLabel: 'Atualizando lembrete',
-                  color: NotaMeiTheme.ink,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ],
               if (_message != null) ...[
@@ -289,7 +289,7 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       border: Border.all(color: feedbackColor),
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -306,9 +306,9 @@ class _DasSettingsScreenState extends State<DasSettingsScreen> {
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   border: Border(
-                    left: BorderSide(color: NotaMeiTheme.ink, width: 2),
+                    left: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 2),
                   ),
                 ),
                 child: Text(
@@ -356,13 +356,13 @@ class _LargeTextTimeDialogState extends State<_LargeTextTimeDialog> {
 
   @override
   Widget build(BuildContext context) => Dialog(
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).colorScheme.surface,
     surfaceTintColor: Colors.transparent,
     elevation: 0,
     insetPadding: const EdgeInsets.all(16),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: NotaMeiTheme.border),
+      side: BorderSide(color: Theme.of(context).colorScheme.outline),
     ),
     child: SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -437,13 +437,13 @@ class _Sheet extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) => Card(
-    color: Colors.white,
+    color: Theme.of(context).colorScheme.surface,
     elevation: 0,
     surfaceTintColor: Colors.transparent,
     margin: EdgeInsets.zero,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: NotaMeiTheme.border),
+      side: BorderSide(color: Theme.of(context).colorScheme.outline),
     ),
     child: Padding(padding: const EdgeInsets.all(16), child: child),
   );
