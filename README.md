@@ -64,6 +64,10 @@ Pedro Isaque é o proprietário do repositório e, no momento, o único integran
 
 São documentos versionáveis, sem dados privados. Novas funcionalidades do benchmark são propostas, não autorização automática para implementar.
 
+## Avaliação com MEI e melhorias propostas
+
+A [síntese da avaliação de 04/11/2026](docs/avaliacao/FEEDBACK-MEI-2026-11-04.md) consolida questionário e entrevista respondidos pelo mesmo MEI, distinguindo tarefas registradas, percepções e limites. O [backlog derivado da escuta](docs/avaliacao/BACKLOG-MELHORIAS.md) registra seis propostas com fontes, decisões abertas e critérios sugeridos; não significa implementação aprovada. PDFs respondidos, contatos e evidências brutas permanecem fora do Git.
+
 ## Tecnologia e desenvolvimento
 
 O aplicativo é desenvolvido em **Flutter/Dart** para Android. Lançamentos são persistidos em SQLite (`sqflite`); preferências de primeiro uso e lembrete usam `shared_preferences`; o agendamento local usa `flutter_local_notifications`; a saída CSV/PDF usa `flutter_file_dialog` e `share_plus`, e a renderização PDF usa o pacote `pdf` com assets locais. Não há backend ou sincronização implementados nesta versão.
