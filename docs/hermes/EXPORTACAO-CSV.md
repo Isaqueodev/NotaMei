@@ -1,8 +1,8 @@
 # NotaMei — Exportação CSV
 
-**Versão da funcionalidade:** implementada na branch `feature/exportacao-csv`, sobre o commit `cd68a826a0c75e85cb00068f648872d9552a8f78` da branch anterior `feature/lancamentos-sequencia-filtro-inicio`. Este documento não substitui validação em aparelho físico.
+**Versão da funcionalidade:** o recorte CSV foi implementado historicamente na branch `feature/exportacao-csv`, sobre o commit `cd68a826a0c75e85cb00068f648872d9552a8f78`. Neste checkout, CSV continua implementado e compartilha regras com PDF e retirada FB08. O commit/branch e as contagens deste documento são históricos; não substituem a inspeção do código atual nem foram reexecutados nesta T04.
 
-> **Evolução PDF:** a branch `feature/exportacao-pdf` conserva CSV e seus contratos públicos, acrescenta saída tipada por bytes/nome/MIME ao gateway e congela a prévia durante a operação em ambos os formatos. A suíte integrada dessa evolução passou em 142 testes; as contagens abaixo descrevem a entrega histórica CSV. Consulte [PDF, limites e validação](EXPORTACAO-PDF.md).
+> **Evolução PDF:** PDF está implementado neste recorte e conserva a seleção, prévia, `CsvReport` e `EntryTotals` do CSV. `buildPdfReport` renderiza em isolate e `ExportDocument` entrega bytes imutáveis, nome e MIME ao mesmo gateway nativo. A suíte integrada PDF registrada historicamente passou em 142 testes; isso não é execução desta T04. Consulte [PDF, limites e validação](EXPORTACAO-PDF.md).
 
 ## Acesso
 
@@ -55,7 +55,7 @@ secao;periodo_inicio;periodo_fim;filtro_ambito;filtro_tipo;id;data;tipo;ambito;v
 
 - Linhas `secao = Lancamento`: um lançamento por linha, com metadados repetidos (período, filtros).
 - Linhas `secao = Resumo`: cinco linhas de totais (Entradas, Saídas, Transferências enviadas, Transferências recebidas, Balanço dos registros selecionados), com `id` e `data` vazios, `tipo` = rótulo do total, `ambito` = rótulo do filtro de âmbito, `categoria`, `natureza` e `withdrawal_id` vazios.
-- Desde FB08, `natureza` distingue lançamento comum de retirada do titular e `withdrawal_id` identifica o par. `criterio_resumo` explica a seleção e a exclusão de internas em Todos em todas as linhas; a mesma explicação aparece na prévia. São 14 colunas sem notas e 15 com notas. A identificação não torna o relatório um backup restaurável.
+- Desde FB08, `natureza` distingue lançamento comum de retirada do titular e `withdrawal_id` identifica o par de linhas Negócio/Pessoal. `criterio_resumo` explica a seleção e a exclusão de internas em Todos em todas as linhas; a mesma explicação aparece na prévia. São 14 colunas sem notas e 15 com notas. A identificação não torna o relatório um backup restaurável.
 
 O nome do arquivo segue o padrão: `notamei_YYYY-MM-DD_YYYY-MM-DD.csv` (início e fim do intervalo selecionado).
 
@@ -95,7 +95,7 @@ Dois botões independentes, ambos desabilitados durante a geração ou se não h
 - O plugin de compartilhamento pode materializar **cópias temporárias em cache** do sistema/do app destino. **Não há promessa de limpeza garantida nem confidencialidade** após a entrega ao Share Sheet.
 - Recomendação: use armazenamento criptografado do aparelho, evite apps de destino não confiáveis e trate o CSV como documento sensível.
 
-## Verificação nesta sessão
+## Verificação histórica do recorte CSV
 
 | Item | Resultado |
 |------|-----------|
@@ -107,7 +107,7 @@ Dois botões independentes, ambos desabilitados durante a geração ou se não h
 | Testes de widget | Filtros, prévia, ações injetadas, falha/nova tentativa, cancelamento, vazio, bloqueio de ação duplicada e 390 px com texto 2x |
 | Validação nativa em dispositivo nesta sessão | **Não realizada**; nenhum dispositivo conectado |
 
-A documentação histórica de FB01/FB02 registra 76 testes; a de V5 registra 95. Execuções anteriores em emulador não são testes nativos desta evolução CSV. Nesta sessão, um CSV real com dados fictícios foi gerado e conferido por um parser Python independente, incluindo estrutura, aspas, múltiplas linhas, TAB e totais.
+A documentação histórica de FB01/FB02 registra 76 testes; a de V5 registra 95; o recorte CSV registra 110 e o PDF registra 142. Essas contagens não são testes executados nesta T04. A conferência de CSV real com dados fictícios e parser independente também pertence ao histórico do recorte CSV.
 
 ## Rollback seguro
 
