@@ -1,12 +1,12 @@
 # NotaMei — documentação de arquitetura C4
 
-**Revisão:** 19 de outubro de 2026.
+**Revisão:** 10 de novembro de 2026.
 
-**Escopo observado:** MVP Android local, incluindo FB01/FB02 na branch `feature/lancamentos-sequencia-filtro-inicio`, sobre a base `a90bc74`.
+**Escopo observado:** MVP Android local na branch `docs/luchie-t04-arquitetura`, incluindo FB01/FB02, FB04/FB05 e FB08 conforme o código presente neste checkout. O código é a fonte de verdade; referências a branches e contagens anteriores abaixo são históricas.
 
-> **Complemento da evolução CSV:** este documento e seus diagramas preservam o retrato anterior à exportação. Na branch `feature/exportacao-csv`, FB04 está implementado em `lib/export/`: Ajustes abre a seleção, `CsvReport` filtra o snapshot sem mutações e `ExportGateway` entrega o arquivo ao seletor de documentos ou compartilhamento Android. Arquivos exportados e aplicativos destinatários ampliam a fronteira de dados; não há backend novo nem migração de banco. Consulte [exportação CSV, validação e rollback](../hermes/EXPORTACAO-CSV.md). Menções à proposta CSV nas seções abaixo são históricas, não ausência do recurso nesta evolução.
+> **Complemento da evolução CSV:** FB04 está implementado em `lib/export/`: Ajustes abre a seleção, `CsvReport` filtra um snapshot sem mutações e `ExportGateway` entrega o arquivo ao seletor de documentos ou ao compartilhamento Android. Arquivos exportados e aplicativos destinatários ampliam a fronteira de dados; não há backend novo. O recorte histórico da implementação CSV e suas contagens antigas estão em [exportação CSV, validação e rollback](../hermes/EXPORTACAO-CSV.md).
 
-> **Complemento PDF (FB05):** em `feature/exportacao-pdf`, Ajustes também abre PDF. `buildPdfReport` renderiza em isolate o mesmo snapshot/totais de `CsvReport`, com Inter e marca locais; `ExportDocument` transporta bytes imutáveis/nome/MIME para `ExportGateway.saveDocument/shareDocument`. CSV conserva seus contratos. Não há novo servidor, banco, migração ou escrita financeira. Os diagramas históricos abaixo não incluem esses componentes; a vista atual resumida está em [requisitos e arquitetura](../hermes/REQUISITOS-ARQUITETURA.md#4-arquitetura-implementada). [Escopo, limites, testes e rollback PDF](../hermes/EXPORTACAO-PDF.md).
+> **Complemento PDF (FB05):** Ajustes também abre PDF. `buildPdfReport` renderiza em isolate o mesmo snapshot/totais de `CsvReport`, com Inter e marca locais; `ExportDocument` transporta bytes imutáveis, nome e MIME para `ExportGateway.saveDocument/shareDocument`. Não há servidor, migração ou escrita financeira novos. A arquitetura atual resumida está em [requisitos e arquitetura](../hermes/REQUISITOS-ARQUITETURA.md#4-arquitetura-implementada); limites e contagens históricas estão em [EXPORTACAO-PDF.md](../hermes/EXPORTACAO-PDF.md).
 
 **Público:** equipe de desenvolvimento, orientação acadêmica e colaboradores.
 **Visualização:** [diagramas em HTML autossuficiente](c4-notamei.html), sem dependências de rede. Este Markdown é a fonte principal; o HTML é uma representação derivada dos diagramas.
@@ -44,7 +44,7 @@ O C4 organiza a estrutura estática em Contexto, Contêineres, Componentes e Có
 
 Os blocos Mermaid usam tipos explícitos, fronteiras e relações nomeadas. São uma representação **no estilo C4**, não uma especificação formal validada por ferramenta C4. Em C4, contêiner significa aplicação ou armazenamento de dados, não necessariamente Docker ou processo independente.[2]
 
-**Legenda:** `[Pessoa]` = usuário; `[Sistema externo]` = plataforma fora da fronteira do NotaMei; `[Sistema]` = produto; `[Contêiner]` = aplicação/armazenamento; `[Componente]` = grupo de responsabilidades dentro do aplicativo. Setas indicam uso/dependência e seus rótulos explicam a comunicação. As vistas 3–8 retratam o recorte observado antes da exportação CSV; a evolução de FB04 está descrita no complemento acima. As propostas da seção 10 refletem o planejamento daquele recorte.
+**Legenda:** `[Pessoa]` = usuário; `[Sistema externo]` = plataforma fora da fronteira do NotaMei; `[Sistema]` = produto; `[Contêiner]` = aplicação/armazenamento; `[Componente]` = grupo de responsabilidades dentro do aplicativo. Setas indicam uso/dependência e seus rótulos explicam a comunicação. As vistas 3–8 preservam diagramas do recorte histórico e não detalham todos os componentes de CSV/PDF; a arquitetura atual de exportação está descrita nos complementos e na seção 9. A seção 10 é explicitamente proposta, exceto FB04/FB05/FB08 já implementados.
 
 ## 2. Direcionadores e aderência acadêmica
 
@@ -191,26 +191,39 @@ classDiagram
     +category : String
     +date : DateTime
     +note : String
+    +withdrawalId : String?
+    +isWithdrawal : bool
   }
   class MonthSummary {
     +incomeCents : int
     +expenseCents : int
+    +receivedCents : int
+    +sentCents : int
+    +balanceOverrideCents : int?
     +balanceCents : int
   }
   EntryRepository --> EntryRecord : persiste e consulta
   EntryRepository --> MonthSummary : calcula para o negocio
 ```
 
-`note` é anulável (`String?`); `balanceCents` é um getter calculado. `EntryType` admite `income`/`expense`; `EntryScope` admite `business`/`personal`. O esquema `entries` espelha `id`, `type`, `scope`, `amount_cents`, `category`, `date` e `note`; não há cadastro de pessoa, conta bancária, tabela de categorias ou itens de compra. A data é persistida em texto ISO; mês e ano respeitam a data registrada, sem conversão de fuso na consulta mensal. [COD: `lib/data/entry_record.dart`, `lib/data/entry_repository.dart`]
+`note` e `withdrawalId` são anuláveis (`String?`); `balanceCents` é um getter calculado. `EntryType` admite `income`/`expense`; `EntryScope` admite `business`/`personal`. O esquema SQLite atual é **versão 2**: a tabela `entries` inclui `withdrawal_id TEXT` além de `id`, `type`, `scope`, `amount_cents`, `category`, `date` e `note`. Na abertura de uma base v1, `onUpgrade` faz apenas `ALTER TABLE ... ADD COLUMN withdrawal_id TEXT`; os registros antigos permanecem com vínculo nulo e as preferências não são alteradas. Não há downgrade de dados nem inferência de vínculo por categoria, valor, data ou nota. A data é persistida em texto ISO; mês e ano respeitam a data registrada, sem conversão de fuso na consulta mensal. [COD: `lib/data/entry_record.dart`, `lib/data/entry_repository.dart`; teste histórico em `test/data/withdrawal_test.dart`]
 
 ### 6.1. Invariantes e limites
 
 - Valor de cada lançamento é positivo e expresso em centavos inteiros; o tipo diferencia entrada e saída.
 - Identificador e categoria não podem estar vazios; o banco também restringe tipos e âmbitos.
-- `upsert` e `remove` passam pela fila `_enqueue`. Isso serializa mutações nesse repositório; não constitui transação distribuída ou política de sincronização.
+- `upsert`, `remove` e `saveWithdrawal` passam pela fila `_enqueue` e usam transações SQLite. As validações de domínio e colisão ocorrem antes ou durante a operação; a alteração e a leitura do novo snapshot ocorrem dentro da transação. O estado em memória e a notificação dos ouvintes só mudam depois do commit bem-sucedido. A fila serializa mutações neste repositório; isso não constitui transação distribuída nem política de sincronização.
+- `saveWithdrawal` valida identificador não vazio e valor positivo e registra duas movimentações vinculadas por `withdrawal_id`: uma despesa no âmbito Negócio e uma entrada no âmbito Pessoal. Ambas pertencem à mesma transação; falha na segunda ponta, na releitura ou nos totais faz a transação falhar sem publicar uma ponta isolada. Retry da mesma operação atualiza as duas linhas determinísticas sem duplicá-las; colisão com registro comum é recusada.
+- A exclusão de um lançamento vinculado a uma retirada remove as duas linhas que compartilham o mesmo `withdrawal_id`, na mesma transação. O `upsert` comum recusa alterar uma ponta vinculada; a remoção e edição da retirada usam o fluxo próprio.
+- `EntryTotals` separa entradas e despesas comuns (`incomeCents` e `expenseCents`) das movimentações internas (`receivedCents` e `sentCents`).
+- Nos âmbitos Negócio e Pessoal, o saldo considera entradas menos despesas, mais valores recebidos e menos valores enviados por retiradas.
+- Na visão consolidada (Todos), as movimentações internas não alteram o saldo: o cálculo considera apenas entradas e despesas comuns.
+- Os totais são acumulados com `BigInt` e validados contra `maxMoneyCents` antes da conversão para `int`, evitando apresentar resultados fora do intervalo monetário suportado.
 - O repositório grava, relê o snapshot e só então notifica ouvintes. Não se promete recuperação automática de qualquer falha de disco ou interrupção de processo.
 - Somas usam `checkedAddCents`; o painel também captura estouro no conjunto selecionado e não mostra total parcial como válido.
 - Negócio/Pessoal é classificação manual, não duas contas bancárias. Total geral não deve ser chamado de faturamento comercial; anual exclui despesas e registros pessoais.
+
+O código observado executa essas mutações em transações, valida os totais antes de publicar o snapshot e notifica somente após a conclusão bem-sucedida. A cobertura documentada historicamente inclui cenários de retirada e falhas simuladas, mas nenhum teste foi executado nesta T04; isso também não garante recuperação após qualquer falha física do dispositivo ou interrupção do processo. [COD: `test/data/withdrawal_test.dart`; histórico em REQ §6.7]
 
 Rastreio: [`entry_record.dart`](../../lib/data/entry_record.dart), [`entry_repository.dart`](../../lib/data/entry_repository.dart), [`money.dart`](../../lib/core/money.dart), [`dashboard_screen.dart`](../../lib/finance/dashboard_screen.dart).
 
@@ -227,7 +240,7 @@ sequenceDiagram
   MEI->>FORM: Preenche dados e toca Salvar e adicionar outro
   FORM->>FORM: Valida e bloqueia salvamentos repetidos
   FORM->>REPO: upsert(novo EntryRecord)
-  REPO->>DB: INSERT OR REPLACE
+  REPO->>DB: Transação SQLite
   alt Persistencia e releitura concluidas
     DB-->>REPO: Gravacao concluida
     REPO->>DB: Consulta registros para atualizar snapshot
@@ -268,11 +281,19 @@ flowchart TB
 ```
 
 - O computador e o ADB servem para construir/instalar/depurar, não são necessários para o uso normal depois da instalação. Não há servidor a iniciar para cadastrar ou consultar. [REQ; COD]
-- A limpeza de dados ou desinstalação pode remover o histórico. Não existe exportação/restauração própria; backup do sistema não foi validado como garantia de recuperação. [REQ]
+- A limpeza de dados ou desinstalação pode remover o histórico local. O aplicativo possui funcionalidades de exportação CSV e PDF, mas os arquivos gerados não constituem um mecanismo de restauração do banco SQLite. O backup do sistema operacional não foi validado como garantia de recuperação dos dados. [REQ]
 - Há permissão de notificação e receptores para eventos como reinício/atualização no manifest; isso não comprova entrega futura, pontualidade ou comportamento em todos os aparelhos. [COD: `android/app/src/main/AndroidManifest.xml`]
 - A configuração `release` ainda usa assinatura de depuração. Antes de distribuição pública, preparar assinatura, atualização, preservação de dados e validações adicionais. [COD: `android/app/build.gradle.kts`]
 
-## 9. Decisões e atributos de qualidade
+## 9. Arquitetura atual de exportação CSV/PDF
+
+FB04 e FB05 compartilham a seleção de `ExportSelection` e o relatório imutável `CsvReport`. A tela escolhe data civil de referência, dia/semana/mês/ano, âmbito (Negócio/Pessoal/Todos), tipo e observações opt-in. O relatório filtra o snapshot do repositório, calcula `EntryTotals` sobre as linhas selecionadas e expõe prévia e arquivo com os mesmos critérios. `Todos` não incorpora pontas internas ao balanço ou aos totais externos, mesmo com filtro de tipo; em âmbito individual, recebidas/enviadas afetam o balanço.
+
+Para CSV, `CsvReport` produz UTF-8 com BOM, delimitador `;`, valores exatos em centavos e campos de natureza e `withdrawal_id`; textos potencialmente interpretáveis como fórmula recebem a mitigação existente. Para PDF, `buildPdfReport` reutiliza o mesmo relatório, valida limites de registros/texto, carrega fonte e marca locais e renderiza em isolate. `ExportDocument` transporta bytes imutáveis, nome e MIME para `ExportGateway`, que chama o seletor local de documentos ou o Share Sheet Android. Esses sistemas e aplicativos destinatários ficam fora do controle do NotaMei.
+
+Gerar, salvar ou compartilhar não cria, edita ou remove lançamentos. CSV e PDF são relatórios para levar dados para fora do app: não são documentos fiscais, sincronização ou backup restaurável; não existe importador/restaurador do banco SQLite. [COD: `lib/export/`, `lib/data/entry_totals.dart`; REQ RN15–RN18]
+
+## 10. Decisões e atributos de qualidade
 
 As entradas abaixo registram o estado e suas consequências; não representam novas ADRs aprovadas para funcionalidades futuras.
 
@@ -288,14 +309,14 @@ As entradas abaixo registram o estado e suas consequências; não representam no
 
 Rastreio: COD, REQ §§3–6. A preferência por simplicidade não deve ser interpretada como certificação de segurança, desempenho ou acessibilidade.
 
-## 10. Evolução proposta — fora da arquitetura atual
+## 11. Evolução proposta — fora da arquitetura atual
 
 **Nenhum componente desta seção está implementado por esta documentação.** As propostas não fecham escopo, prazo, provedor nem tecnologia.
 
 | Demanda | Ponto de extensão a avaliar | Condições e decisões pendentes |
 | --- | --- | --- |
 | FB03 — QR/código de barras | Captura → interpretação → prévia editável → confirmação → repositório | Tipo de código, origem dos dados, total ou itens, câmera, conteúdo não confiável e duplicidade. Ler um código não significa importar uma compra inteira. |
-| FB04/FB05 — CSV/PDF | Serviço local de seleção de período e âmbito → geradores de arquivo | Mesmas regras nos dois formatos, privacidade no compartilhamento, campos, totais, paginação e proteção contra fórmulas no CSV. Relatório não é backup restaurável. |
+| ~~FB04/FB05 — CSV/PDF~~ | **Implementado; ver seção 9.** | O recorte histórico desta tabela é mantido para rastreabilidade. Não tratar como ausência do recurso. |
 | FB06 — assistência | Interface isolada de assistência, com cálculos determinísticos fora do modelo | Tarefa útil delimitada, aparelho mínimo, licença e recursos do modelo, comportamento sem IA e confirmação antes de qualquer alteração. |
 | Expectativa acadêmica de API | Adaptador de integração delimitado pelo caso de uso | Confirmar critério com a orientação; escolher finalidade real, fonte, contrato, privacidade, limites, falhas e alternativa offline. Não criar um backend só para preencher um diagrama. |
 | IA online, se escolhida | Serviço remoto opcional, fora do caminho obrigatório de salvar/consultar | Consentimento, autenticação quando necessária, segredos fora do APK, minimização, retenção, custo e indisponibilidade. Não pressupõe sincronização. |
@@ -303,7 +324,7 @@ Rastreio: COD, REQ §§3–6. A preferência por simplicidade não deve ser inte
 
 As extensões devem preservar o núcleo manual offline. Na futura assistência, observações e documentos são dados não confiáveis, não comandos; sugestões não devem executar mutações sem confirmação. Exportação, IA ou integrações não convertem automaticamente o produto em sistema fiscal. [REQ: FB03–FB07]
 
-## 11. Rastreabilidade e verificação
+## 12. Rastreabilidade e verificação
 
 | Tema | Implementação | Evidência / limite |
 | --- | --- | --- |
@@ -314,11 +335,11 @@ As extensões devem preservar o núcleo manual offline. Na futura assistência, 
 | Lembretes | `lib/das/` e manifest Android | `test/das/`; faltam observação da entrega futura e variedade de aparelhos/políticas. |
 | Integração acadêmica/social | PDFs e pesquisa exploratória | Documentar testes observados e devolutiva consentida; não apresentar benefícios como já medidos. |
 
-REQ §6.7 registra a validação técnica anterior desta evolução: análise estática limpa, 76 testes aprovados e APK exercitado em emulador com dados fictícios. Esses resultados são históricos dessa implementação, **não** uma nova execução de Flutter na produção deste documento, nem uma validação independente das afirmações dos PDFs.
+REQ §6.7 registra contagens de validações anteriores: 76 testes na evolução FB01/FB02, 95 no V5, 110 no recorte CSV e 142 no recorte PDF, além de análises/builds descritos ali. São evidências históricas dessas implementações, **não** uma nova execução de Flutter nesta tarefa, nem uma validação independente das afirmações dos PDFs.
 
 Antes de ampliar o escopo: definir critérios de aceitação, revisar este C4 contra o diff, testar cenários de erro, planejar migrações/recuperação e conferir os critérios acadêmicos de IA/API com a orientação. Atualizar o Markdown e regenerar o HTML sempre que os diagramas mudarem.
 
-## 12. Proteção dos anexos
+## 13. Proteção dos anexos
 
 A pasta `docs/documentação_contextualizar/` contém os três PDFs e o arquivo de respostas e está em `.gitignore`. Nenhum desses arquivos estava rastreado quando a regra foi aplicada. Ignorar não é criptografar: os arquivos continuam no computador e podem existir em cópias locais. Antes de qualquer commit, conferir `git status` e `git diff --cached`; não usar `git add -f` nos anexos.
 
