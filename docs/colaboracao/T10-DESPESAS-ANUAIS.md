@@ -30,7 +30,7 @@ Ler o [contrato geral](TAREFA-PARA-IA.md) e a [implementação segura](../../.ag
 Inspecionados na base acima:
 
 - `lib/annual/annual_summary.dart`: `AnnualRecordedIncome` e `recordedAnnualIncome` já calculam entradas externas comerciais em doze meses, com soma protegida.
-- `lib/annual/annual_income_screen.dart`: `AnnualIncomeScreen` já recebe `entries`, `year` e `onYearChanged`; apresenta ano, entradas, meses e avisos.
+- `lib/annual/annual_income_screen.dart`: conferência documental em `9076f3d` confirma que `AnnualIncomeScreen` recebe `entries` e `year`, sem `onYearChanged` ou seletor de ano. A composição passa o ano corrente; a tela apresenta entradas, meses e avisos. A menção anterior ao callback era incorreta e não autoriza criar essa API.
 - `test/annual/annual_summary_test.dart` e `test/annual/annual_income_screen_test.dart`: testes existentes, incluindo interpretação de histórico parcial e meses futuros.
 - `lib/core/money.dart`: limites e utilitários de soma/formatação.
 - `lib/data/entry_record.dart`: tipos, âmbitos e vínculo da retirada; ler antes de montar fixtures.
@@ -58,7 +58,7 @@ Confirmar os chamadores antes da alteração. Preservar as APIs de entradas e o 
 - [ ] **Separação:** registros Pessoais não entram; uma retirada vinculada completa não aumenta entrada nem despesa anual do Negócio.
 - [ ] **Só despesas:** com despesas e nenhuma entrada, continuar exibindo despesas; não ocultar a seção inteira por ausência de receitas.
 - [ ] **Vazio:** sem registros, mostrar ausência de informação com legenda honesta; não escrever que houve inatividade. Zero acumulado de registros não significa saldo bancário zero.
-- [ ] **Histórico e datas:** manter o comportamento de ano selecionado, meses futuros e histórico parcial; sem converter datas silenciosamente para outro fuso ou limitar ao mês corrente.
+- [ ] **Histórico e datas:** manter o ano fornecido à tela, meses futuros e histórico parcial; sem converter datas silenciosamente para outro fuso ou limitar ao mês corrente. Troca de ano pode ser testada reconstruindo o widget com outro `year`; não exige adicionar seletor de ano nesta fatia.
 - [ ] **Integridade:** consulta não altera registros. Edição/exclusão já refletida na lista de entrada recalcula o resumo; não criar persistência ou cache paralelo.
 - [ ] **Limites:** overflow mensal ou anual das despesas não gera valor parcial, negativo por estouro ou total truncado; apresentar aviso seguro e indisponibilidade dos valores afetados. Entradas continuam seguindo sua proteção atual.
 - [ ] **Acessibilidade automatizada:** leitura/rótulos distinguem entradas de despesas; doze meses alcançáveis com rolagem e layout de 390 px com texto 2x sem exceção de overflow. Não chamar teste de widget de ensaio TalkBack.
