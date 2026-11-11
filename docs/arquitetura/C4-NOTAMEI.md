@@ -1,8 +1,8 @@
 # NotaMei — documentação de arquitetura C4
 
-**Revisão:** 10 de novembro de 2026.
+**Revisão:** 11 de novembro de 2026. **Base de código inspecionada:** `9076f3d`.
 
-**Escopo observado:** MVP Android local na branch `docs/luchie-t04-arquitetura`, incluindo FB01/FB02, FB04/FB05 e FB08 conforme o código presente neste checkout. O código é a fonte de verdade; referências a branches e contagens anteriores abaixo são históricas.
+**Escopo observado:** MVP Android local, incluindo FB01/FB02, FB04/FB05 e FB08. Revisão documental na branch `docs/requisitos-rastreabilidade`, sem mudança do aplicativo. O código é a fonte de verdade; referências a branches e contagens anteriores são históricas. Os seis diagramas desta edição e o HTML derivado foram alinhados ao recorte observado, não a um servidor fictício.
 
 > **Complemento da evolução CSV:** FB04 está implementado em `lib/export/`: Ajustes abre a seleção, `CsvReport` filtra um snapshot sem mutações e `ExportGateway` entrega o arquivo ao seletor de documentos ou ao compartilhamento Android. Arquivos exportados e aplicativos destinatários ampliam a fronteira de dados; não há backend novo. O recorte histórico da implementação CSV e suas contagens antigas estão em [exportação CSV, validação e rollback](../hermes/EXPORTACAO-CSV.md).
 
@@ -44,7 +44,9 @@ O C4 organiza a estrutura estática em Contexto, Contêineres, Componentes e Có
 
 Os blocos Mermaid usam tipos explícitos, fronteiras e relações nomeadas. São uma representação **no estilo C4**, não uma especificação formal validada por ferramenta C4. Em C4, contêiner significa aplicação ou armazenamento de dados, não necessariamente Docker ou processo independente.[2]
 
-**Legenda:** `[Pessoa]` = usuário; `[Sistema externo]` = plataforma fora da fronteira do NotaMei; `[Sistema]` = produto; `[Contêiner]` = aplicação/armazenamento; `[Componente]` = grupo de responsabilidades dentro do aplicativo. Setas indicam uso/dependência e seus rótulos explicam a comunicação. As vistas 3–8 preservam diagramas do recorte histórico e não detalham todos os componentes de CSV/PDF; a arquitetura atual de exportação está descrita nos complementos e na seção 9. A seção 10 é explicitamente proposta, exceto FB04/FB05/FB08 já implementados.
+**Legenda:** `[Pessoa]` = usuário; `[Sistema externo]` = plataforma/aplicativo fora da fronteira do NotaMei; `[Sistema]` = produto; `[Contêiner]` = aplicação/armazenamento; `[Componente]` = responsabilidade dentro do app. Setas nomeiam chamadas locais, SQL ou ponte de plugin, não HTTP. C1 não expõe o banco; C2 contém app e armazenamentos locais; C3 expande somente o aplicativo. A vista de código é seletiva; sequência e implantação complementam as vistas estáticas. A seção 10 registra decisões observadas; propostas futuras ficam na seção 11.
+
+**Rastreabilidade e decisões:** [matriz de requisitos, feedbacks e evidências](RASTREABILIDADE.md) e [ADRs retrospectivos](decisoes/README.md). Metas de RNF não são resultados medidos; registrar arquitetura existente não ratifica retroativamente decisões da equipe. Não se aplica aqui a obrigação de cliente-servidor, endpoints HTTP ou dois serviços externos de outro exercício acadêmico.
 
 ## 2. Direcionadores e aderência acadêmica
 
@@ -79,12 +81,17 @@ Apoiar o registro manual de entradas e saídas e a consulta de movimentações, 
 **Escopo:** NotaMei como sistema único. **Público:** pessoas envolvidas no produto e na orientação acadêmica.
 
 ```mermaid
+---
+title: C1 - Contexto atual do NotaMei
+---
 flowchart LR
   MEI["Pessoa MEI<br/>[Pessoa]<br/>Registra e consulta movimentações"]
   APP["NotaMei<br/>[Sistema]<br/>Organização financeira manual e local"]
   ANDROID["Plataforma Android<br/>[Sistema externo]<br/>Permissões e notificações locais"]
+  DEST["Aplicativo destinatário<br/>[Sistema externo opcional]<br/>Escolhido pela pessoa ao compartilhar"]
   MEI -->|"Usa a interface no telefone"| APP
-  APP -->|"Solicita permissão e agenda/cancela avisos por plugin"| ANDROID
+  APP -->|"Plugins: avisos, seletor de arquivos e Share Sheet"| ANDROID
+  APP -->|"CSV/PDF somente por compartilhamento voluntário via Android"| DEST
   ANDROID -->|"Exibe lembrete pessoal, se permitido pelo sistema"| MEI
 ```
 
@@ -97,24 +104,27 @@ GitHub, Flutter SDK, Android SDK, Hermes, OpenCode e Stitch pertencem ao desenvo
 **Escopo:** fronteira do NotaMei. Os dois armazenamentos são locais ao aplicativo, não servidores separados.[2]
 
 ```mermaid
+---
+title: C2 - Aplicativo e armazenamentos locais
+---
 flowchart LR
   MEI["Pessoa MEI<br/>[Pessoa]"]
   OS["Plataforma Android<br/>[Sistema externo]"]
   subgraph SYS["NotaMei — fronteira do sistema"]
     UI["Aplicativo Android<br/>[Contêiner: Flutter / Dart]<br/>Interface, regras e coordenação local"]
-    DB[("Lançamentos<br/>[Contêiner de dados: SQLite]<br/>notamei.db / tabela entries")]
+    DB[("Lançamentos<br/>[Contêiner de dados: SQLite v2]<br/>notamei.db / entries / withdrawal_id")]
     PREF[("Preferências locais<br/>[Contêiner de dados: shared_preferences]<br/>Primeiro uso e lembrete")]
     UI -->|"sqflite: leitura e gravação local"| DB
     UI -->|"API shared_preferences: leitura e gravação local"| PREF
   end
   MEI -->|"Toques e entrada de dados"| UI
-  UI -->|"Plugins: permissão e agendamento local"| OS
+  UI -->|"Plugins locais: avisos, documentos e compartilhamento"| OS
 ```
 
 | Elemento | Responsabilidade | Tecnologia / persistência |
 | --- | --- | --- |
 | Aplicativo | Tour, navegação, formulário, painel, histórico, anual e lembretes | Flutter/Dart em um aplicativo Android; componentes não são serviços distribuídos. |
-| Lançamentos | Armazenar registros manuais e recuperar o histórico | `sqflite`, SQLite, esquema versão 1; snapshot em memória atualizado após operações de persistência. |
+| Lançamentos | Armazenar registros e retiradas vinculadas | `sqflite`, SQLite, esquema versão 2; migração aditiva de v1 e snapshot publicado após commit. |
 | Preferências | Guardar conclusão do tour e configuração do lembrete | `shared_preferences`; não guarda o livro de lançamentos. |
 | Plataforma Android | Permissões, agendamento e apresentação de avisos | `flutter_local_notifications`, `timezone` e `flutter_timezone`; dependência do comportamento do aparelho. |
 
@@ -127,37 +137,53 @@ Não há HTTP de negócio, banco remoto, backend, autenticação, sincronizaçã
 **Escopo:** contêiner Aplicativo Android. Os grupos abaixo organizam responsabilidades reais; não representam uma implementação formal de Clean Architecture.
 
 ```mermaid
+---
+title: C3 - Componentes dentro do aplicativo Android
+---
 flowchart TB
   DB[("SQLite local<br/>[Contêiner de dados]")]
   PREF[("Preferências locais<br/>[Contêiner de dados]")]
   OS["Android<br/>[Sistema externo]"]
   subgraph APP["Aplicativo Android — Flutter / Dart"]
-    BOOT["main + NotaMeiApp<br/>[Componente]<br/>Inicialização, tour e navegação"]
-    FIN["Telas financeiras<br/>[Componente]<br/>Formulário, painel e histórico"]
+    BOOT["main + StartupScreen + NotaMeiApp<br/>[Componente: composição]<br/>Abertura, retry, tour e navegação"]
+    FIN["Telas financeiras<br/>[Componente: apresentação]<br/>Formulários comuns/retirada, painel e histórico"]
     ANNUAL["Acompanhamento anual<br/>[Componente]<br/>Tela e recordedAnnualIncome"]
     REPO["EntryRepository + EntryRecord<br/>[Componente]<br/>Persistência e snapshot dos registros"]
     MONEY["Funções monetárias<br/>[Componente]<br/>parseMoney, formatMoney, checkedAddCents"]
+    TOTALS["EntryTotals<br/>[Componente: cálculo]<br/>Comuns, internas e balanço por âmbito"]
+    EX["ExportScreen<br/>[Componente: apresentação]<br/>Seleção e prévia congeladas"]
+    REPORT["CsvReport + buildPdfReport<br/>[Componente: geração]<br/>Seleção/totais comuns e PDF em isolate"]
+    OUT["ExportGateway + ExportDocument<br/>[Componente: saída]<br/>Bytes, nome e MIME para plugins"]
     DAS["DasReminderService<br/>[Componente]<br/>Configuração e ativação do lembrete"]
     GATE["Gateway e agendamento DAS<br/>[Componente]<br/>LocalDasNotificationsGateway / AndroidDasPlatform"]
     BOOT -->|"Inicializa e injeta repositório"| REPO
     BOOT -->|"Compõe telas e rotas"| FIN
+    BOOT -->|"Abre exportação por Ajustes"| EX
     BOOT -->|"Fornece registros e ano corrente"| ANNUAL
     BOOT -->|"Inicializa, atualiza e abre ajustes"| DAS
     FIN -->|"Consulta snapshot e solicita mutações"| REPO
     ANNUAL -->|"Usa funções de adição de centavos"| MONEY
     FIN -->|"Valida, soma e formata valores"| MONEY
     REPO -->|"Confere somas comerciais"| MONEY
+    REPO -->|"Valida resumos do snapshot"| TOTALS
+    FIN -->|"Calcula o recorte selecionado"| TOTALS
+    EX -->|"Lê snapshot sem mutação"| REPO
+    EX -->|"Congela seleção e solicita documento"| REPORT
+    REPORT -->|"Reutiliza regra financeira"| TOTALS
+    EX -->|"Solicita salvar ou compartilhar"| OUT
+    REPORT -->|"Entrega documento imutável à tela"| EX
     DAS -->|"Usa interface DasNotificationGateway"| GATE
   end
   REPO -->|"sqflite: SQL local"| DB
   BOOT -->|"Lê/grava conclusão do tour"| PREF
   DAS -->|"Lê/grava configuração pessoal"| PREF
   GATE -->|"Plugin: solicita permissão e agenda/cancela"| OS
+  OUT -->|"Plugin: seletor de documentos ou Share Sheet"| OS
 ```
 
 | Componente / fontes | Responsabilidade e limite |
 | --- | --- |
-| [`main`](../../lib/main.dart), [`NotaMeiApp`](../../lib/app/notamei_app.dart), [`onboarding/`](../../lib/onboarding/) | Inicialização e composição por construtores; `IndexedStack` conserva telas das abas. A falha de atualização do lembrete produz aviso sem bloquear o acesso financeiro. |
+| [`main`](../../lib/main.dart), [`StartupScreen`](../../lib/app/startup_screen.dart), [`NotaMeiApp`](../../lib/app/notamei_app.dart), [`onboarding/`](../../lib/onboarding/) | Inicialização/composição por construtores; retry de abertura sem limpeza automática; falha de refresh DAS não bloqueia a abertura financeira. `IndexedStack` conserva abas. |
 | [`EntryFormScreen`](../../lib/finance/entry_form_screen.dart) | Cria/edita/exclui com o repositório. FB01 é adicional ao salvamento normal; na sequência, só limpa valor/observação após sucesso. Edição não oferece sequência. |
 | [`DashboardScreen`](../../lib/finance/dashboard_screen.dart), [`EntryHistoryScreen`](../../lib/finance/entry_history_screen.dart) | Consultas e filtros locais. No Início, Negócio/Pessoal/Todos filtra totais, recentes e vazio. A seleção vive no estado da tela, não em preferências persistidas. |
 | [`EntryRepository`](../../lib/data/entry_repository.dart), [`EntryRecord`](../../lib/data/entry_record.dart) | Banco, snapshot imutável e notificação de ouvintes; mutações serializadas por fila de futures. Telas dependem diretamente do repositório. |
@@ -165,6 +191,9 @@ flowchart TB
 | [`annual/`](../../lib/annual/) | `recordedAnnualIncome` recebe registros e ano; não consulta banco ou API. A composição atual passa os registros do repositório e o ano corrente. |
 | [`DasReminderService`](../../lib/das/das_reminder_service.dart) | Valida configuração, pede permissão via gateway e guarda preferências após agendar; desativação cancela os avisos próprios. |
 | [`local_das_gateway.dart`](../../lib/das/local_das_gateway.dart), [`das_schedule.dart`](../../lib/das/das_schedule.dart) | Cálculo de datas, janela móvel de 12 avisos, adaptação ao fuso e ponte Android; agendamento aproximado, sem calendário fiscal automático. |
+| [`EntryTotals`](../../lib/data/entry_totals.dart) | Regra compartilhada de totais externos/internos por âmbito; acumuladores exatos, sem interpretar balanço como saldo bancário. |
+| [`ExportScreen`](../../lib/export/export_screen.dart), [`CsvReport`](../../lib/export/csv_export.dart), [`buildPdfReport`](../../lib/export/pdf_export.dart) | Seleção/prévia e geração local; PDF reutiliza o relatório e renderiza em isolate, sem segunda regra financeira. |
+| [`ExportGateway`](../../lib/export/export_gateway.dart), [`ExportDocument`](../../lib/export/export_document.dart) | Saída voluntária de bytes, nome e MIME; nativo controla seletor/compartilhamento, sem comprovar entrega final. |
 
 **Estado da separação de responsabilidades:** existe separação por arquivos e domínio, mas não uma camada independente de casos de uso. O painel calcula totais do filtro sobre `forMonth`; `summaryFor` no repositório permanece comercial. A soma anual recebe registros; não precisa depender do repositório diretamente. [COD]
 
@@ -173,11 +202,15 @@ flowchart TB
 **Escopo:** persistência e seus objetos de dados em `lib/data/`. Recorte manual de classes e membros relevantes, não catálogo completo. O nível de código é opcional e deve ser atualizado quando essas estruturas mudarem.[3]
 
 ```mermaid
+---
+title: Código - Recorte de persistência e retirada
+---
 classDiagram
   class EntryRepository {
     +entries : List~EntryRecord~
     +initialize() Future~void~
     +upsert(entry) Future~void~
+    +saveWithdrawal(operationId, amountCents, date, note) Future~void~
     +remove(id) Future~void~
     +forMonth(month) List~EntryRecord~
     +summaryFor(month) MonthSummary
@@ -190,7 +223,7 @@ classDiagram
     +amountCents : int
     +category : String
     +date : DateTime
-    +note : String
+    +note : String?
     +withdrawalId : String?
     +isWithdrawal : bool
   }
@@ -232,6 +265,9 @@ Rastreio: [`entry_record.dart`](../../lib/data/entry_record.dart), [`entry_repos
 **Escopo:** criação de um novo lançamento; respostas de erro são separadas do caminho de sucesso.
 
 ```mermaid
+---
+title: Fluxo local - Salvar e adicionar outro
+---
 sequenceDiagram
   actor MEI as Pessoa MEI
   participant FORM as EntryFormScreen
@@ -240,15 +276,17 @@ sequenceDiagram
   MEI->>FORM: Preenche dados e toca Salvar e adicionar outro
   FORM->>FORM: Valida e bloqueia salvamentos repetidos
   FORM->>REPO: upsert(novo EntryRecord)
-  REPO->>DB: Transação SQLite
-  alt Persistencia e releitura concluidas
-    DB-->>REPO: Gravacao concluida
-    REPO->>DB: Consulta registros para atualizar snapshot
-    DB-->>REPO: Registros persistidos
-    REPO-->>FORM: Future concluido e ouvintes notificados
+  REPO->>DB: Inicia transação e grava registro
+  REPO->>DB: Relê snapshot dentro da transação
+  REPO->>REPO: Valida totais aplicáveis antes do commit
+  alt Escrita, releitura e validação concluídas
+    DB-->>REPO: Commit concluído e snapshot retornado
+    REPO->>REPO: Publica snapshot e notifica ouvintes
+    REPO-->>FORM: Future concluído com sucesso
     FORM->>FORM: Limpa valor/observacao e mantem classificacao/data
     FORM-->>MEI: Confirma sucesso e retorna foco ao valor, sem fechar
-  else Operacao falha
+  else Falha antes do commit
+    DB-->>REPO: Transação revertida e erro
     REPO-->>FORM: Erro
     FORM-->>MEI: Mantem preenchimento e permite nova tentativa
   end
@@ -256,13 +294,16 @@ sequenceDiagram
 
 O salvamento normal fecha o formulário após sucesso por `onSaved`; a sequência permanece na tela e cada novo cadastro usa outro identificador. A edição mantém o identificador do registro existente. Campos textuais, novos salvamentos e retorno ficam bloqueados durante a gravação; isso **não** afirma que todos os seletores da interface sejam desativados nessa versão. [COD: `lib/finance/entry_form_screen.dart`; REQ: §6.1]
 
-**Falha ambígua:** se a escrita em SQLite concluir e a releitura falhar, a interface recebe erro, mas o registro pode já estar no disco. A mensagem de erro não prova ausência de gravação; uma política de recuperação/idempotência para falhas desse tipo merece teste específico. Não confundir o teste de falha simulada antes da escrita com cobertura de todos os pontos de falha.
+**Fronteira de falha:** na base inspecionada, `upsert` grava e relê o snapshot dentro da transação; uma falha nessa releitura não deve ser descrita como escrita já confirmada fora da transação. Após o commit, outras falhas de interface/processo ainda podem existir: erro genérico não prova ausência de persistência em qualquer cenário. Esta revisão conferiu o caminho estático, sem executar novos testes de interrupção ou recuperação.
 
 ## 8. Vista de implantação — execução local
 
 **Escopo:** aparelho Android com APK instalado. É uma vista lógica de implantação, não garantia de isolamento contra qualquer acesso físico ou comportamento do sistema.
 
 ```mermaid
+---
+title: Implantação - Execução local no Android
+---
 flowchart TB
   MEI["Pessoa MEI<br/>[Pessoa]"]
   subgraph DEVICE["Dispositivo: telefone Android"]
@@ -295,14 +336,14 @@ Gerar, salvar ou compartilhar não cria, edita ou remove lançamentos. CSV e PDF
 
 ## 10. Decisões e atributos de qualidade
 
-As entradas abaixo registram o estado e suas consequências; não representam novas ADRs aprovadas para funcionalidades futuras.
+As entradas abaixo registram o estado e suas consequências; não representam novas ADRs aprovadas para funcionalidades futuras. ARQ-01/ARQ-07 estão relacionadas a [ADR-001](decisoes/ADR-001-NUCLEO-LOCAL.md), ARQ-02 a [ADR-002](decisoes/ADR-002-SQLITE-TRANSACOES.md) e ARQ-03 a [ADR-003](decisoes/ADR-003-CENTAVOS-EXATOS.md). São registros retrospectivos com ratificação pendente, não atas históricas.
 
 | ID | Decisão atual | Consequência / cuidado |
 | --- | --- | --- |
 | ARQ-01 | Núcleo local sem backend | Uso offline de cadastro e consulta; dados não seguem para uma conta do produto. Recuperação e troca de aparelho não estão resolvidas. |
 | ARQ-02 | SQLite + snapshot observado por `ChangeNotifier` | Persistência antes da atualização visível; telas reagem ao repositório. Crescimento do histórico exigirá medir consultas, memória e paginação. |
 | ARQ-03 | Centavos inteiros e regras determinísticas | Evita cálculo monetário em ponto flutuante; validação e limites continuam necessários. |
-| ARQ-04 | Telas usam diretamente o repositório | Simplicidade para o MVP; antes de exportação/captura/IA, avaliar serviços de aplicação para compartilhar regras sem duplicar lógica nas telas. |
+| ARQ-04 | Telas usam diretamente o repositório | Simplicidade do MVP; exportação já compartilha `CsvReport`/`EntryTotals`. Nova camada de aplicação para captura/IA depende de escopo, sem refatoração automática. |
 | ARQ-05 | Gateway para notificações | Permite testes com dublês e separa agendamento da ponte Android; entrega real continua dependente do aparelho. |
 | ARQ-06 | Filtro do Início não persistido | Mantém estado na navegação e troca de mês; ao reabrir o app volta a Negócio. |
 | ARQ-07 | Pesquisa privada separada da síntese pública | Documentos originais ficam ignorados; só sínteses revisadas e sem dados individuais entram na documentação compartilhável. |
@@ -325,6 +366,8 @@ Rastreio: COD, REQ §§3–6. A preferência por simplicidade não deve ser inte
 As extensões devem preservar o núcleo manual offline. Na futura assistência, observações e documentos são dados não confiáveis, não comandos; sugestões não devem executar mutações sem confirmação. Exportação, IA ou integrações não convertem automaticamente o produto em sistema fiscal. [REQ: FB03–FB07]
 
 ## 12. Rastreabilidade e verificação
+
+A [matriz completa](RASTREABILIDADE.md) relaciona todos os RNF, RF/FB e os seis MEL-MEI a decisões, componentes e planos de verificação, preservando estados futuros e lacunas. Não há contrato HTTP de negócio porque não existe API desse tipo no produto. A tabela abaixo é somente um índice temático, não substitui a matriz.
 
 | Tema | Implementação | Evidência / limite |
 | --- | --- | --- |
