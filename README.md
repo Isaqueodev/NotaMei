@@ -111,3 +111,11 @@ Esta versão cobre o fluxo local de apresentação, uso manual e **relatórios C
 Para continuar o desenvolvimento com o Hermes Agent em outro computador, consulte [as instruções de migração para Windows](docs/hermes/IMPORTAR-WINDOWS.md) e a [síntese compartilhável de requisitos e arquitetura](docs/hermes/REQUISITOS-ARQUITETURA.md). Elas transferem apenas conhecimento revisado e não incluem respostas individuais da pesquisa, conversas ou credenciais.
 
 A [documentação de arquitetura C4](docs/arquitetura/C4-NOTAMEI.md) relaciona a implementação atual aos direcionadores acadêmicos, explicita as lacunas de IA/API e separa propostas futuras. Os [diagramas em HTML](docs/arquitetura/c4-notamei.html) podem ser abertos sem internet. Os PDFs e as respostas brutas permanecem locais em uma pasta ignorada pelo Git.
+
+### Requisitos, decisões e verificação
+
+- [Catálogo de RF, classificação das regras e RNF mensuráveis](docs/hermes/REQUISITOS-ARQUITETURA.md): IDs preservados, prioridades propostas e distinção entre código existente, metas e validação pendente.
+- [ADRs de decisões observadas](docs/arquitetura/decisoes/README.md): núcleo local, SQLite/transações e centavos exatos; registros retrospectivos com ratificação pendente, não atas históricas.
+- [Matriz de rastreabilidade](docs/arquitetura/RASTREABILIDADE.md): requisitos/feedbacks → decisões/componentes → cobertura e planos de verificação. Metas propostas e testes citados não significam aprovação ou nova execução.
+
+A organização aproveita boas práticas de requisitos e C4 de um enunciado acadêmico, sem executar seu cenário fictício nem impor backend, endpoints HTTP, visibilidade pública ou arquivo único ao NotaMei. Novas funcionalidades, incluindo despesas anuais de T10, mantêm seu estado de planejamento até implementação e testes próprios.

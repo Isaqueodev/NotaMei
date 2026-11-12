@@ -4,6 +4,8 @@
 
 **Como ler os estados:** *implementado* significa presente no código; *observado no A17* indica um fluxo exercitado naquele aparelho numa versão de teste; *pendente* exige trabalho ou validação. Um teste automatizado ou um alarme agendado não prova entrega futura de aviso nem adequação fiscal.
 
+**Revisão documental:** 11/11/2026, base `9076f3d`. Esta revisão organiza requisitos e decisões sem alterar código ou regras financeiras. As prioridades são propostas de organização, não prazos. [ADRs](../arquitetura/decisoes/README.md) e [rastreabilidade completa](../arquitetura/RASTREABILIDADE.md) distinguem decisões reconstruídas, metas propostas, cobertura existente e validações ainda não executadas. O enunciado acadêmico usado como referência de estrutura não impõe servidor, APIs HTTP, repositório público ou arquivo único ao NotaMei.
+
 ## 1. Problema, objetivo e limites
 
 O produto procura facilitar o registro de entradas e saídas do negócio, tornar explícita a distinção entre movimentações do negócio e pessoais e permitir consulta do histórico informado. O ator principal é a pessoa MEI que usa um telefone Android; a equipe do projeto pode orientar testes, mas **não recebe automaticamente** lançamentos ou acesso ao aparelho.
@@ -12,23 +14,25 @@ A primeira versão opera com lançamento **manual e local**. Não há integraç�
 
 ## 2. Requisitos funcionais e situação no MVP
 
-| ID | Necessidade / critério de aceitação | Situação e rastreio |
-| --- | --- | --- |
-| RF01 | Cadastrar entrada ou saída manual com valor positivo em reais, data, categoria e observação opcional; impedir valores inválidos e reencontrar o registro após reabrir. | **Implementado** em [`lib/finance/entry_form_screen.dart`](../../lib/finance/entry_form_screen.dart) e [`lib/data/entry_repository.dart`](../../lib/data/entry_repository.dart); persistência exercitada no A17. |
-| RF02 | Marcar cada lançamento como Negócio ou Pessoal; registros pessoais não compõem os totais do negócio. A marcação **não separa contas bancárias**. | **Implementado** em [`lib/data/entry_record.dart`](../../lib/data/entry_record.dart), repositório e telas financeiras. |
-| RF03 | Exibir entradas, saídas e balanço aritmético mensal do negócio; período e estado vazio devem estar visíveis. Não chamar a diferença de lucro ou saldo bancário. | **Implementado** em [`lib/finance/dashboard_screen.dart`](../../lib/finance/dashboard_screen.dart). |
-| RF04 | Consultar por mês, filtrar Negócio/Pessoal e Entrada/Saída, editar e excluir com confirmação; atualizar os resumos após mudanças. | **Implementado** em [`lib/finance/entry_history_screen.dart`](../../lib/finance/entry_history_screen.dart), formulário e repositório; fluxos principais exercitados no A17. |
-| RF05 | Gráfico mensal de entradas e saídas com rótulos e alternativa textual. | **Não implementado.** O painel atual usa números e lista, sem gráfico; decidir se a visualização adicional agrega valor após feedback. |
-| RF06 | Lembrete **pessoal** do DAS com dia/hora escolhidos, permissão solicitada ao ativar e opção de cancelar; não presumir vencimento nem pagamento. | **Agendamento/cancelamento implementados** em [`lib/das/`](../../lib/das/). No A17 foram vistos alarmes criados e cancelados; a entrega em data futura, efeitos de bateria/fuso e variedade de aparelhos **não foram comprovados**. |
-| RF07 | Acompanhar entradas comerciais informadas no ano, sem interpretar histórico parcial como ausência de movimento ou limite fiscal atendido. | **Soma descritiva implementada** em [`lib/annual/`](../../lib/annual/), apenas para entradas do negócio registradas no ano corrente. Aviso anual configurável, receita anterior declarada e comparações com limite legal **não implementados**. |
-| RF10 | Tour opcional de três passos, opção de começar sem tour, pular para o Início, tela de conclusão distinta e reabertura em Ajustes sem apagar dados. | **Implementado** em [`lib/onboarding/`](../../lib/onboarding/) e [`lib/app/`](../../lib/app/); fluxo exercitado no A17. |
-| RF08–09 | Relatórios detalhados, metas, comprovantes, fiado e sincronização entre dispositivos. | **Parcial:** relatórios CSV/PDF por período e filtros implementados em FB04/FB05; metas, comprovantes, fiado e sincronização continuam futuros, com requisitos próprios. |
+| ID | Requisito funcional / limite de aceitação | Prioridade proposta | Situação e rastreio |
+| --- | --- | --- | --- |
+| RF01 | O sistema deve permitir que a pessoa MEI cadastre entrada ou saída manual com valor positivo em reais, data, categoria e observação opcional, e consulte o registro após reabrir; valores inválidos devem ser recusados. | Alta | **Implementado** em [`entry_form_screen.dart`](../../lib/finance/entry_form_screen.dart) e [`entry_repository.dart`](../../lib/data/entry_repository.dart); observação no A17 é histórica, não repetida nesta revisão. |
+| RF02 | O sistema deve permitir que a pessoa MEI classifique cada lançamento como Negócio ou Pessoal; registros pessoais não compõem totais do negócio. A marcação não separa contas bancárias. | Alta | **Implementado** em [`entry_record.dart`](../../lib/data/entry_record.dart), repositório e telas financeiras. |
+| RF03 | O sistema deve permitir que a pessoa MEI consulte entradas, saídas e balanço aritmético mensal, com período e âmbito explícitos, sem apresentar a diferença como lucro ou saldo bancário. | Alta | **Implementado** em [`dashboard_screen.dart`](../../lib/finance/dashboard_screen.dart); FB02 acrescenta Negócio/Pessoal/Todos. |
+| RF04 | O sistema deve permitir que a pessoa MEI consulte o histórico por mês, combine filtros de âmbito e tipo e edite ou exclua com confirmação; os resumos devem refletir a alteração e o cancelamento não deve modificar registros. | Alta | **Implementado** em [`entry_history_screen.dart`](../../lib/finance/entry_history_screen.dart), formulário e repositório; fluxos observados no A17 pertencem ao histórico de validação. |
+| RF05 | O sistema deve permitir que a pessoa MEI consulte um gráfico mensal de entradas e saídas com rótulos e alternativa textual. | Baixa | **Não implementado.** O painel atual usa números e lista; necessidade adicional ainda deve ser validada. |
+| RF06 | O sistema deve permitir que a pessoa MEI configure e cancele um lembrete pessoal do DAS, escolhendo dia e horário e autorizando notificações, sem presumir vencimento ou pagamento. | Média | **Agendamento/cancelamento implementados** em [`lib/das/`](../../lib/das/). Alarmes históricos no A17 não comprovam entrega futura, bateria/fuso ou variedade de aparelhos. |
+| RF07 | O sistema deve permitir que a pessoa MEI consulte entradas comerciais informadas no ano, discriminadas por mês, sem interpretar histórico parcial como ausência de movimento ou limite fiscal atendido. | Alta | **Soma descritiva implementada** em [`lib/annual/`](../../lib/annual/); a composição atual passa o ano corrente. Aviso anual, receitas anteriores declaradas e comparação fiscal não implementados. Despesas anuais são evolução atribuída em T10, ainda não implementada nesta base. |
+| RF10 | O sistema deve permitir que a pessoa MEI escolha um tour opcional de três passos, comece ou pule diretamente para o Início e reveja o tour em Ajustes sem apagar dados, com conclusão distinta. | Média | **Implementado** em [`lib/onboarding/`](../../lib/onboarding/) e [`lib/app/`](../../lib/app/); observação no A17 é histórica. |
+| RF08–09 | O sistema deve permitir que a pessoa MEI consulte relatórios detalhados e, no agrupamento histórico ainda a decompor, gerencie metas, comprovantes, fiado e sincronização entre dispositivos. | Média, sujeita à definição de cada recorte | **Agrupamento legado, não dois RF atômicos definidos. Parcial:** somente CSV/PDF de FB04/FB05 implementados. Os demais itens são futuros; não inferir qual pertence individualmente a RF08 ou RF09 sem decisão e histórico próprios. |
+
+**Identificadores preservados:** o agrupamento RF08–09 fica explícito como dívida de especificação; não foi artificialmente dividido para atingir quantidade mínima. FB01–FB08 e MEL-MEI-01–06 mantêm seus códigos. O contrato [T10](../colaboracao/T10-DESPESAS-ANUAIS.md) detalha a evolução de RF07, sem mudar o estado atual para implementado.
 
 **Casos ainda sem regra fechada:** transferências entre contas em geral, venda parcelada, estorno, duplicidade e lançamento anterior à instalação. A retirada do titular tem recorte manual definido e implementado em FB08 (Negócio → Pessoal, sem contagem duplicada), sem classificação fiscal automática. Uma classificação manual não resolve automaticamente os demais casos. Antes de automatizar qualquer comparação fiscal, definir o conceito de receita, cobertura do histórico, versão das regras e revisão por fonte oficial e especialista. Nenhum valor de teto ou data legal deve ser inferido do balanço de caixa.
 
 ### 2.1. Regras de negócio (RN)
 
-**Finalidade:** os RF descrevem capacidades do produto; as RN abaixo explicitam condições, restrições e significado das operações. Os RNF da seção 3 tratam das características técnicas e de qualidade. Os identificadores **RN01–RN24** são próprios deste catálogo e não substituem nem renumeram RF, US ou FB.
+**Finalidade e classificação revisada:** os RF descrevem capacidades; o prefixo histórico **RN01–RN24** reúne regras de domínio, aplicação e restrições técnicas, portanto não significa que todas sejam regras de negócio independentes do software. A classificação efetiva está na seção 2.1.9; os detalhes abaixo são preservados para rastreio. RNF tratam da qualidade mensurável na seção 3. Nenhum identificador foi renumerado e nenhuma regra financeira foi alterada.
 
 **Base e estado:** regras confrontadas com `c57cabe`, incluindo a retirada FB08, e estendidas ao PDF na branch `feature/exportacao-pdf` sem renumerar as RN. *Implementada* significa presente no recorte de código indicado; a referência a um teste identifica cobertura existente, não uma nova execução nem aprovação fiscal. Este catálogo não transforma propostas do backlog em regras autorizadas e não estabelece legislação ou obrigações contábeis.
 
@@ -116,21 +120,60 @@ No cenário inicial, os totais externos em Todos são Entradas = R$ 1.000,00 e S
 
 **Decisões ainda abertas, não regras implementadas:** transferências genéricas, venda parcelada, estorno, deduplicação por conteúdo, importação/histórico anterior estruturado, recorrência da retirada, categorias próprias, alertas anuais fiscais e backup/restauração. Datas retroativas ou futuras não recebem tratamento contábil especial; os intervalos dos seletores atuais são limitações de interface, não política fiscal de elegibilidade. A captura de compras, a IA e a versão Lite mantêm os estados/condicionantes da seção 6. A exportação PDF está implementada em FB05. RF05, RF08–09 e RF10 não recebem regras novas por inferência neste catálogo.
 
+### 2.1.9. Classificação das regras preservadas
+
+**D:** política/semântica do domínio; **A:** comportamento ou fluxo da aplicação; **T:** restrição técnica/atributo de qualidade. Entradas mistas devem ser lidas por cláusula, não contadas integralmente como regras de negócio. As prioridades abaixo são propostas documentais.
+
+| ID estável | Classificação efetiva | Prioridade | Enquadramento / relação |
+| --- | --- | --- | --- |
+| RN01 | D + A | Alta | Natureza/âmbito do movimento são domínio; identificador e registro manual são modelagem/escopo de RF01–02. |
+| RN02 | D + A + T | Alta | Valor positivo é convenção do modelo; formato pt-BR é entrada da aplicação; limite de representação é RNF03. |
+| RN03 | D + A | Alta | Data/classificação descrevem o registro; menu de categorias e vínculo explícito são implementação. |
+| RN04 | D | Alta | Recorte civil do registro informado, sem interpretação fiscal automática. |
+| RN05 | A | Alta | Editar, confirmar/cancelar e atualizar consultas são comportamentos de RF04. |
+| RN06 | D | Alta | Separação de âmbitos e de movimentos externos/internos. |
+| RN07 | D | Alta | Significado aritmético do balanço, independente da interface. |
+| RN08 | D | Alta | Histórico parcial não prova saldo, inatividade ou capacidade de pagamento. |
+| RN09 | D + A | Alta | Entradas comerciais compõem o anual; exibição do ano corrente é recorte da tela. |
+| RN10 | D + A | Alta | Uma retirada tem dois efeitos vinculados; IDs e colunas são representação técnica. |
+| RN11 | A + T | Alta | Transação, retry e colisão são mecanismos de integridade de RNF02, não política fiscal. |
+| RN12 | D + A | Alta | Corrigir a operação integral preserva sua semântica; formulário/diálogo são aplicação. |
+| RN13 | D | Alta | Movimentação interna não cria receita/despesa externa. |
+| RN14 | D / limite de escopo | Alta | Registro manual não executa pagamento nem determina enquadramento fiscal. |
+| RN15 | A | Média | Seleção de período, filtros e valores iniciais de FB04/FB05. |
+| RN16 | D + A + T | Alta | Mesma seleção e mesma regra financeira; congelamento de snapshot é integridade/coerência. |
+| RN17 | A + T | Alta | Escolha de compartilhar, observações opt-in e proteção de dados em RNF04. |
+| RN18 | A / limite de escopo | Alta | Exportação somente de leitura; relatório não é restauração ou documento fiscal. |
+| RN19 | A / limite de escopo | Média | Configuração da agenda pessoal, não obrigação de negócio nem vencimento legal. |
+| RN20 | A | Média | Política de calendário do lembrete; calendário civil não vira regra fiscal. |
+| RN21 | A + T | Alta | Permissão, cancelamento e recuperação de falhas; ver RNF08 e política T02 pendente. |
+| RN22 | A / RF01 + FB01 | Média | Fluxo de salvar em sequência, não regra de negócio independente do produto. |
+| RN23 | A / RF02–04 + FB02 | Alta | Estado de filtros e ausência de mutação ao consultar. |
+| RN24 | A + T | Alta | Bloqueio de interação e confirmação após persistência; ver RNF02. |
+
 ## 3. Requisitos não funcionais e verificação
 
-| Tema | Decisão / estado atual | Verificação que falta |
-| --- | --- | --- |
-| Offline | Cadastro e consulta usam SQLite no próprio aparelho; preferências e avisos são locais. | Repetir testes em modo avião e em outros Androids; internet pode ser necessária apenas para obter o APK ou outras tarefas fora do app. |
-| Dinheiro e datas | Valores são centavos inteiros; somas têm validação de limite; datas de registros são exibidas em pt-BR e filtradas por mês/ano. | Testar cenários de data, mudança de ano e atualização de versão no aparelho. |
-| Integridade | Operações de gravação precedem atualização visível; bloqueio de duplo toque no salvamento e tratamento de erro permitem nova tentativa. SQLite usa esquema versão 2: coluna nullable `withdrawal_id`, com migração aditiva real de v1 e operações de retirada em transação (duas pontas e releitura antes do commit). | Validar atualização no aparelho; não existe downgrade de dados implementado. |
-| Privacidade | O app não oferece sincronização própria; registros ficam localmente. O sistema operacional pode ter política de backup própria. | Documentar e testar política de cópia/recuperação antes de depender de dados reais; avaliar riscos em aparelho perdido ou compartilhado. |
-| Exportação PDF | Até 1.000 registros e 200.000 unidades UTF-16 de texto incluído; Inter local, geração em isolate, recusa orientada de símbolos sem glifo e de volume excessivo, sem truncamento silencioso. CSV permanece alternativa. | Validar memória/tempo e salvar/compartilhar em Android real; [recorte e testes](EXPORTACAO-PDF.md). |
-| Acessibilidade | Textos de erro e rótulos são necessários para uso sem depender só da cor; tour e navegação devem continuar utilizáveis sem animações. | Medir legibilidade, foco, áreas de toque e preferência por redução de movimento em testes observados. |
-| Avisos | Alarmes locais dependem de permissão, sistema e economia de bateria. Dia 29–31 ajusta ao último dia em mês curto; agenda móvel de até 12 lembretes se renova ao abrir o app. | Observar a entrega real, reinício do aparelho, fuso horário e alterações de permissão; nunca prometer pontualidade. |
+**Como interpretar:** os critérios tornam verificável a qualidade pretendida, não certificam o produto. **Meta proposta** precisa de revisão da equipe e execução identificada; **restrição observada** já está no código e não foi novamente testada aqui. Não há novos resultados de Flutter, medições de desempenho ou ensaios Android nesta revisão. Cada RNF está ligado a uma decisão/vista e a um plano em [rastreabilidade](../arquitetura/RASTREABILIDADE.md).
+
+| ID / categoria | Prioridade | Critério mensurável e condição | Base e situação da verificação |
+| --- | --- | --- | --- |
+| RNF01 — disponibilidade offline | Alta | **Meta proposta:** em modo avião, concluir cadastro de 10 registros fictícios e reencontrar os mesmos 10 após reabrir; zero dependência de login/servidor do produto para cadastro e consulta. | Núcleo local observado; ensaio Android identificado pendente. Obter APK ou compartilhar por aplicativo externo não faz parte dessa garantia. |
+| RNF02 — integridade transacional | Alta | **Critério do recorte existente:** em falhas injetadas antes do commit da retirada, zero pares parciais publicados/persistidos; após retry com o mesmo ID, exatamente um par. Nenhum aviso de sucesso antes do retorno bem-sucedido. | Transações e publicação após commit em `EntryRepository`; testes existentes não executados nesta revisão. Não é garantia contra toda falha física. |
+| RNF03 — exatidão monetária | Alta | **Critério do modelo existente:** 100% dos casos sintéticos de soma/formatação nos limites definidos correspondem aos centavos esperados; fora do intervalo, recusar sem resultado truncado. | Centavos/`BigInt` e validações observados; cobertura em `test/core/` e `test/finance/`, sem nova execução. Limite é técnico, não fiscal. |
+| RNF04 — privacidade e saída voluntária | Alta | **Meta proposta:** zero transmissão financeira automática iniciada pelo núcleo; observações ausentes por padrão em CSV/PDF; cancelamento não dispara compartilhamento nem modifica lançamentos em todos os cenários do roteiro. | Arquitetura local e opt-in observados; auditar fluxos/saída nativa em ambiente identificado. Política de backup Android e acesso físico são limites separados, sem promessa de criptografia ou anonimato. |
+| RNF05 — usabilidade/acessibilidade | Alta | **Meta proposta:** em 390 px lógicos de largura e texto 2x, zero exceções de overflow e todos os controles essenciais de salvar/cancelar alcançáveis; no ensaio TalkBack, valor, observação, salvar e cancelar identificáveis por rótulo. | Cobertura de widget não equivale a TalkBack; ver `test/finance/`, `test/annual/` e `docs/AVALIACAO-ACESSIBILIDADE-T03.md`. Revalidação do candidato pendente. |
+| RNF06 — compatibilidade Android | Média | **Meta proposta:** aprovar o roteiro central em dois níveis de API Android identificados, incluindo o mínimo efetivo do APK e outro nível suportado; registrar pacote, commit, assinatura, API e dispositivo/emulador. | Níveis concretos e disponibilidade dos aparelhos a definir em T05 antes da execução; não há promessa de iOS/web/Windows como plataformas do aplicativo. |
+| RNF07 — limites da exportação PDF | Média | **Restrição observada:** até 1.000 registros e 200.000 unidades UTF-16 de texto incluído; excesso deve ser recusado antes da renderização, sem truncamento. Caso válido ainda depende de fonte/assets e geração bem-sucedida. | Constantes/checagens em `pdf_export.dart`; cobertura existente em `test/export/`. Não certifica disponibilidade dos assets, memória, tempo ou salvar/compartilhar nativos. |
+| RNF08 — confiabilidade do lembrete | Alta | **Meta proposta sobre regras existentes:** acertar todos os casos de mês curto/virada de ano do roteiro; próximo aviso estritamente futuro, janela de até 12 avisos; falha de refresh não deve bloquear a abertura financeira. | `das_schedule.dart`, gateway e `StartupScreen`; definir política de falha parcial de T02 separadamente. Entrega real, reinício, bateria, fuso e permissões precisam de observação; sem SLA de entrega. |
+| RNF09 — desempenho de gravação | Média | **Meta proposta, ainda sem aceite/medição:** com base sintética de 500 registros, medir 20 salvamentos comuns sequenciais após abertura e obter P95 de até 2 s entre confirmar e retorno persistido; documentar aparelho/API, candidato, condições e método do percentil. | Não há benchmark atual que demonstre esse valor. Limite deve ser revisto pela equipe; sem promessa de tempo para PDF ou seletor/compartilhamento externo. |
+| RNF10 — evolução e preservação de dados | Alta | **Critério da migração existente:** atualizar fixture v1 com 10 registros para v2 preservando os 10 IDs/valores/datas e `withdrawal_id` nulo; conservar preferências. **Meta de ensaio:** repetir atualização do APK sem limpar a base sintética. | Migração aditiva observada; cobertura em `test/data/withdrawal_test.dart`; ensaio de atualização em T05/T06 pendente. Rollback de código e CSV/PDF não são restauração; downgrade não implementado. |
 
 ## 4. Arquitetura implementada
 
 ```mermaid
+---
+title: Visão local de responsabilidades - NotaMei
+---
 flowchart LR
   P[Pessoa MEI] --> UI[Flutter: tour, painel, histórico, ano e ajustes]
   UI --> R[EntryRepository + EntryRecord]
@@ -143,7 +186,7 @@ flowchart LR
   PDF -->|Mesmo snapshot e totais| CSV
   PDF --> BYTES[ExportDocument: bytes, nome e MIME]
   EX --> EG[ExportGateway]
-  EG --> BYTES
+  EG -->|Recebe como argumento de saída| BYTES
   EG --> DOC[Seletor local de documentos Android]
   EG --> SHARE[Compartilhamento Android]
   UI --> S[DasReminderService]
@@ -152,10 +195,12 @@ flowchart LR
   G --> ANDROID[Plugin / alarmes do Android]
 ```
 
-- [`lib/main.dart`](../../lib/main.dart) inicializa preferências, repositório e serviço DAS antes de abrir [`NotaMeiApp`](../../lib/app/notamei_app.dart). Falha de atualização de notificações não deve impedir acesso aos lançamentos.
+**Legenda:** visão de responsabilidades locais, não um nível C4 adicional. Retângulos são módulos/plataformas, cilindros são armazenamentos; setas descrevem dependências e passagem de dados. Para fronteiras e níveis separados, consultar o [C4](../arquitetura/C4-NOTAMEI.md).
+
+- [`lib/main.dart`](../../lib/main.dart) abre [`StartupScreen`](../../lib/app/startup_screen.dart), que inicializa repositório/preferências/DAS e só então compõe [`NotaMeiApp`](../../lib/app/notamei_app.dart). Falha de refresh gera aviso não bloqueante; falha de abertura oferece retry sem limpeza automática de dados.
 - [`EntryRecord`](../../lib/data/entry_record.dart) tem identificador local, tipo, âmbito, valor em centavos, categoria textual, data, observação opcional e `withdrawalId` nullable. O vínculo é explícito; textos antigos não são reinterpretados. Não há tabela separada de categorias ou dados históricos declarados.
 - [`EntryRepository`](../../lib/data/entry_repository.dart) persiste lançamentos e retiradas vinculadas em SQLite. As telas chamam o repositório diretamente; não existe uma camada formal separada de casos de uso. [`EntryTotals`](../../lib/data/entry_totals.dart) centraliza totais de painel, resumo do repositório e relatórios CSV/PDF com `BigInt`; painel/repositório checam o intervalo ao converter. A soma anual exclui internas e filtra entradas comerciais externas do ano selecionado.
-- [`DasReminderService`](../../lib/das/das_reminder_service.dart) guarda preferências e usa um gateway de notificações; a ponte Android em [`local_das_gateway.dart`](../../lib/das/local_das_gateway.dart) agenda/cancela identificadores próprios. Uma falha parcial deve desativar a preferência e tentar cancelar alarmes próprios.
+- [`DasReminderService`](../../lib/das/das_reminder_service.dart) guarda preferências e usa a ponte [`local_das_gateway.dart`](../../lib/das/local_das_gateway.dart). As proteções da ativação não devem ser generalizadas para todo refresh: a política de falha parcial permanece dependente de T02, conforme RN21.
 - Não existe servidor, API, PostgreSQL, autenticação nem sincronização na arquitetura atual. São opções **futuras**, dependentes de decisão de produto, proteção de dados, resolução de conflitos e testes; não pré-requisitos para o MVP offline.
 - [`lib/export/`](../../lib/export/) separa seleção/prévia (`ExportScreen`), seleção e totais comuns (`CsvReport`), renderização PDF em isolate (`buildPdfReport`) e saída nativa (`ExportGateway`). A tela conserva o snapshot durante a operação; `ExportDocument` entrega bytes imutáveis, nome e MIME ao gateway; não há escrita no repositório nem alteração do esquema SQLite. Arquivos e apps destinatários ficam fora do controle do NotaMei. Consulte escopo, validação e rollback de [CSV](EXPORTACAO-CSV.md) e [PDF](EXPORTACAO-PDF.md).
 
