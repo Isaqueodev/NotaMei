@@ -7,6 +7,7 @@ import '../data/entry_totals.dart';
 import 'withdrawal_form_screen.dart';
 import '../theme/notamei_theme.dart';
 import 'editorial_widgets.dart';
+import 'recorded_continuity_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   final EntryRepository repository;
@@ -98,12 +99,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   excludeFromSemantics: true,
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  'NotaMei',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    'NotaMei',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -277,6 +280,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               icon: const Icon(Icons.swap_horiz),
               label: const Text('Pagar-me'),
+            ),
+            const SizedBox(height: 16),
+            RecordedContinuityCard(
+              key: const Key('recorded-continuity'),
+              entries: widget.repository.entries,
+              month: _selectedMonth,
+              scope: _scope,
             ),
             const SizedBox(height: 24),
             Wrap(
