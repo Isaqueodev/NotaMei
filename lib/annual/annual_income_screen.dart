@@ -111,7 +111,7 @@ class AnnualIncomeScreen extends StatelessWidget {
                           expenses.totalCents == null
                               ? 'Indisponível'
                               : formatMoney(expenses.totalCents!),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: 'Playfair Display',
                             fontSize: 32,
                             fontWeight: FontWeight.w700,
@@ -222,7 +222,7 @@ class AnnualIncomeScreen extends StatelessWidget {
     final color = cents == null
         ? Theme.of(context).colorScheme.error
         : cents == 0
-        ? NotaMeiTheme.muted
+        ? Theme.of(context).colorScheme.onSurfaceVariant
         : isExpense
         ? NotaMeiTheme.expense
         : NotaMeiTheme.income;
