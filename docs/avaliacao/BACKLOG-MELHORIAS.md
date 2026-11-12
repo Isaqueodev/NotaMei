@@ -10,9 +10,9 @@ Revalidar cada item no código/versão vigente antes de implementar. Separar nec
 
 - Fonte: F1 seção J, p.5; F2 Q7 e Q14, pp.4–5.
 - Necessidade: visualizar valores remanescentes do período anterior e acompanhar continuidade financeira.
-- Situação: proposta a especificar; o balanço mensal atual representa registros selecionados, não saldo bancário.
+- Situação: recorte autorizado e implementado localmente em 12/11/2026; integração e ensaio Android pendentes. O balanço mensal continua separado e não representa saldo bancário. Ver [contrato e evidências de continuidade](../colaboracao/MEL-MEI-01-CONTINUIDADE.md).
 - Prioridade sugerida: alta para definição de escopo; esforço alto.
-- Decisões antes de implementar: saldo inicial informado ou acumulado histórico? A partir de qual data? Como mostrar histórico incompleto, edições/exclusões retroativas e âmbitos? Como distinguir movimento do mês de valor acumulado?
+- Decisão aprovada em 12/11/2026: acumulado desde o primeiro registro elegível, sem saldo inicial manual; períodos civis e âmbitos explícitos, histórico parcial avisado e recálculo após edições/exclusões. Detalhes e limites no contrato acima.
 - Critérios propostos: preservar o balanço do período; indicador acumulado separado e explicitamente limitado aos registros informados; centavos exatos; testes de virada de mês/ano e retroatividade; retiradas sem duplicação em Todos; nenhuma inferência de lucro/saldo bancário ou lançamento sintético duplicado.
 - Relação: base para esclarecer MEL-MEI-04. Não alterar regra financeira por inferência.
 
