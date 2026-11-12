@@ -118,7 +118,7 @@ class AnnualIncomeScreen extends StatelessWidget {
                           final amount = summary.monthlyCents[month]!;
                           final value = Semantics(
                             label: amount == 0
-                                ? '${_months[month - 1]}: sem entrada informada; movimento não confirmado'
+                                ? '—: sem entrada informada; movimento não confirmado'
                                 : null,
                             child: Text(
                               amount == 0 ? '—' : '+ ${formatMoney(amount)}',
