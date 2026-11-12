@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:notamei/theme/notamei_theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -32,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
         children: [
           Text(
-            'CONFIGURAÃ‡Ã•ES LOCAIS',
+            'CONFIGURAÇÕES LOCAIS',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -45,7 +45,7 @@ class SettingsScreen extends StatelessWidget {
             ),
               const SizedBox(height: 16),
             ],
-                    const _SectionTitle('AparÃªncia'),
+                    const _SectionTitle('Aparência'),
           _Sheet(
             child: _ThemeModeRow(
               themeMode: themeMode,
@@ -54,7 +54,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          const _SectionTitle('AÃ§Ãµes e seguranÃ§a'),
+          const _SectionTitle('Ações e segurança'),
           _Sheet(
             child: Column(
               children: [
@@ -86,7 +86,7 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.file_download_outlined,
                 title: 'Exportar CSV',
                 subtitle:
-                    'Escolha perÃ­odo e filtros para salvar ou compartilhar.',
+                    'Escolha período e filtros para salvar ou compartilhar.',
                 onTap: onExportCsv,
               ),
             ),
@@ -98,7 +98,7 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.picture_as_pdf_outlined,
                 title: 'Exportar PDF',
                 subtitle:
-                    'RelatÃ³rio para leitura, com os mesmos perÃ­odos e filtros.',
+                    'Relatório para leitura, com os mesmos períodos e filtros.',
                 onTap: onExportPdf,
               ),
             ),
@@ -108,16 +108,16 @@ class SettingsScreen extends StatelessWidget {
             child: _SettingRow(
               icon: Icons.phone_android,
               title: 'Dados salvos no aparelho',
-              subtitle: 'O app nÃ£o oferece sincronizaÃ§Ã£o prÃ³pria; cÃ³pias do sistema dependem das suas configuraÃ§Ãµes.',
+              subtitle: 'O app não oferece sincronização própria; cópias do sistema dependem das suas configurações.',
             ),
           ),
           const SizedBox(height: 12),
           const _Notice(
-            text: 'Limpar os dados ou desinstalar o app pode apagar seu histÃ³rico. NÃ£o hÃ¡ backup prÃ³prio nem restauraÃ§Ã£o pelo NotaMei nesta versÃ£o.',
+            text: 'Limpar os dados ou desinstalar o app pode apagar seu histórico. Não há backup próprio nem restauração pelo NotaMei nesta versão.',
           ),
           const SizedBox(height: 12),
           const _Notice(
-            text: 'O NotaMei nÃ£o confirma pagamento. Use os canais oficiais para verificar o DAS e seus comprovantes.',
+            text: 'O NotaMei não confirma pagamento. Use os canais oficiais para verificar o DAS e seus comprovantes.',
           ),
           const SizedBox(height: 24),
           const _SectionTitle('Sobre o NotaMei'),
@@ -141,7 +141,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Caderno de registro manual para MEI. Entradas, saÃ­das e acompanhamento dos valores informados. Sem vÃ­nculo bancÃ¡rio ou validaÃ§Ã£o fiscal.',
+                    'Caderno de registro manual para MEI. Entradas, saídas e acompanhamento dos valores informados. Sem vínculo bancário ou validação fiscal.',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],

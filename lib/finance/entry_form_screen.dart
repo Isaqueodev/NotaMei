@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../core/money.dart';
 import '../data/entry_record.dart';
@@ -44,24 +44,24 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
 
   final List<String> _businessIncomeCategories = [
     'Vendas',
-    'ServiÃ§os Prestados',
-    'ComissÃµes',
+    'Serviços Prestados',
+    'Comissões',
     'Outras Receitas',
   ];
 
   final List<String> _businessExpenseCategories = [
-    'Mercadorias / MatÃ©ria-prima',
-    'Aluguel / Ãgua / Luz',
+    'Mercadorias / Matéria-prima',
+    'Aluguel / Água / Luz',
     'Impostos / Taxas (DAS)',
-    'Marketing / DivulgaÃ§Ã£o',
+    'Marketing / Divulgação',
     'Outras Despesas',
   ];
 
   final List<String> _personalCategories = [
-    'AlimentaÃ§Ã£o',
+    'Alimentação',
     'Moradia',
     'Transporte',
-    'SaÃºde / Lazer',
+    'Saúde / Lazer',
     'Outros Pessoais',
   ];
 
@@ -116,7 +116,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
       _savedForAnother = false;
       final text = _amountController.text.trim();
       if (text.isEmpty) {
-        _amountError = 'Informe o valor do lanÃ§amento';
+        _amountError = 'Informe o valor do lançamento';
       } else {
         try {
           parseMoney(text);
@@ -183,7 +183,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _saveError = 'NÃ£o foi possÃ­vel salvar o lanÃ§amento. Revise o valor e tente novamente.';
+          _saveError = 'Não foi possível salvar o lançamento. Revise o valor e tente novamente.';
           _saving = false;
         });
         _revealError();
@@ -205,9 +205,9 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Excluir LanÃ§amento'),
+        title: const Text('Excluir Lançamento'),
         content: const Text(
-          'Tem certeza de que deseja excluir este lanÃ§amento? Esta aÃ§Ã£o nÃ£o poderÃ¡ ser desfeita.',
+          'Tem certeza de que deseja excluir este lançamento? Esta ação não poderá ser desfeita.',
         ),
         actions: [
           TextButton(
@@ -243,7 +243,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
         if (mounted) {
           setState(() {
             _saveError =
-                'NÃ£o foi possÃ­vel excluir o lanÃ§amento. Tente novamente.';
+                'Não foi possível excluir o lançamento. Tente novamente.';
             _saving = false;
           });
           _revealError();
@@ -286,7 +286,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text(isEditing ? 'Editar LanÃ§amento' : 'Novo LanÃ§amento'),
+          title: Text(isEditing ? 'Editar Lançamento' : 'Novo Lançamento'),
           actions: [
             if (isEditing)
               IconButton(
@@ -294,7 +294,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                   Icons.delete_outline,
                   color: NotaMeiTheme.expense,
                 ),
-                tooltip: 'Excluir LanÃ§amento',
+                tooltip: 'Excluir Lançamento',
                 onPressed: _saving ? null : _confirmDelete,
               ),
           ],
@@ -324,7 +324,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                             ),
                           ),
                         ),
-                      _label('Tipo de movimentaÃ§Ã£o'),
+                      _label('Tipo de movimentação'),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
@@ -338,7 +338,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                             ),
                             (
                               EntryType.expense,
-                              'Despesa (SaÃ­da)',
+                              'Despesa (Saída)',
                               NotaMeiTheme.expense,
                             ),
                           ])
@@ -367,7 +367,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      _label('Ã‚mbito do lanÃ§amento'),
+                      _label('Âmbito do lançamento'),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -386,7 +386,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                           items: const [
                             DropdownMenuItem(
                               value: EntryScope.business,
-                              child: Text('NegÃ³cio'),
+                              child: Text('Negócio'),
                             ),
                             DropdownMenuItem(
                               value: EntryScope.personal,
@@ -412,8 +412,8 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                       const SizedBox(height: 8),
                       Text(
                         _scope == EntryScope.business
-                            ? 'Entra no resumo do negÃ³cio'
-                            : 'Isolado do negÃ³cio (Pessoal)',
+                            ? 'Entra no resumo do negócio'
+                            : 'Isolado do negócio (Pessoal)',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -453,8 +453,8 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                       const SizedBox(height: 8),
                       Text(
                         _type == EntryType.income
-                            ? 'Entrada manual a ser somada no balanÃ§o'
-                            : 'SaÃ­da manual a ser descontada do balanÃ§o',
+                            ? 'Entrada manual a ser somada no balanço'
+                            : 'Saída manual a ser descontada do balanço',
                         style: TextStyle(color: typeColor, fontSize: 14),
                       ),
                       const SizedBox(height: 24),
@@ -508,21 +508,21 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      _label('AnotaÃ§Ã£o (Opcional)'),
+                      _label('Anotação (Opcional)'),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _noteController,
                         readOnly: _saving,
                         maxLines: 3,
                         decoration: InputDecoration(
-                          hintText: 'Adicione uma observaÃ§Ã£o, se desejar',
+                          hintText: 'Adicione uma observação, se desejar',
                           filled: true,
                           fillColor: Theme.of(context).colorScheme.surface,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Registro manual e local. NÃ£o Ã© uma declaraÃ§Ã£o fiscal.',
+                        'Registro manual e local. Não é uma declaração fiscal.',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -548,7 +548,7 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                         child: Semantics(
                           liveRegion: true,
                           child: Text(
-                            'LanÃ§amento salvo. VocÃª pode adicionar outro.',
+                            'Lançamento salvo. Você pode adicionar outro.',
                             style: TextStyle(
                               color: NotaMeiTheme.income,
                               fontSize: 14,
@@ -570,8 +570,8 @@ class _EntryFormScreenState extends State<EntryFormScreen> {
                       ),
                       child: Text(
                         isEditing
-                            ? 'Salvar AlteraÃ§Ãµes'
-                            : 'Adicionar LanÃ§amento',
+                            ? 'Salvar Alterações'
+                            : 'Adicionar Lançamento',
                         textAlign: TextAlign.center,
                       ),
                     ),

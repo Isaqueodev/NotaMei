@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../data/entry_record.dart';
 import '../data/entry_repository.dart';
@@ -67,7 +67,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
           ..sort((a, b) => b.date.compareTo(a.date));
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(title: const Text('HistÃ³rico')),
+      appBar: AppBar(title: const Text('Histórico')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -78,7 +78,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
               onNext: () => _changeMonth(1),
             ),
             const SizedBox(height: 20),
-            const Text('Ã‚mbito', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('Âmbito', style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -92,7 +92,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                   }),
                 ),
                 _chip(
-                  'NegÃ³cio',
+                  'Negócio',
                   _scopeFilter == EntryScope.business,
                   (selected) => setState(
                     () => _scopeFilter = selected ? EntryScope.business : null,
@@ -123,7 +123,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                   color: NotaMeiTheme.income,
                 ),
                 _chip(
-                  'SaÃ­das',
+                  'Saídas',
                   _typeFilter == EntryType.expense,
                   (selected) => setState(
                     () => _typeFilter = selected ? EntryType.expense : null,
@@ -153,7 +153,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Nenhum lanÃ§amento encontrado',
+                          'Nenhum lançamento encontrado',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -162,7 +162,7 @@ class _EntryHistoryScreenState extends State<EntryHistoryScreen> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Tente mudar os filtros ou o mÃªs selecionado.',
+                          'Tente mudar os filtros ou o mês selecionado.',
                           textAlign: TextAlign.center,
                         ),
                       ],
