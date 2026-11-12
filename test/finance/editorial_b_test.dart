@@ -251,10 +251,13 @@ void main() {
         tester.widget<Text>(find.text('R\$ 1.460,00')).style!.color,
         NotaMeiTheme.expenseDark,
       );
-      expect(find.byKey(const Key('recent-ledger')), findsOneWidget);
       expect(find.byType(Image), findsOneWidget);
       await tester.tap(action);
       expect(added, isTrue);
+      // O painel de continuidade desloca a folha para abaixo da dobra.
+      await tester.scrollUntilVisible(find.byKey(const Key('recent-ledger')), 150);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('recent-ledger')), findsOneWidget);
       await tester.ensureVisible(find.text('Ver todos'));
       await tester.tap(find.text('Ver todos'));
       expect(history, isTrue);
