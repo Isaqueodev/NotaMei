@@ -10,7 +10,7 @@ Revalidar cada item no código/versão vigente antes de implementar. Separar nec
 
 - Fonte: F1 seção J, p.5; F2 Q7 e Q14, pp.4–5.
 - Necessidade: visualizar valores remanescentes do período anterior e acompanhar continuidade financeira.
-- Situação: recorte autorizado e implementado localmente em 12/11/2026; integração e ensaio Android pendentes. O balanço mensal continua separado e não representa saldo bancário. Ver [contrato e evidências de continuidade](../colaboracao/MEL-MEI-01-CONTINUIDADE.md).
+- Situação: recorte autorizado e integrado pela PR #27, presente em `0cacabc`; ensaio Android pendente em T05. O balanço mensal continua separado e não representa saldo bancário. Ver [contrato e evidências de continuidade](../colaboracao/MEL-MEI-01-CONTINUIDADE.md).
 - Prioridade sugerida: alta para definição de escopo; esforço alto.
 - Decisão aprovada em 12/11/2026: acumulado desde o primeiro registro elegível, sem saldo inicial manual; períodos civis e âmbitos explícitos, histórico parcial avisado e recálculo após edições/exclusões. Detalhes e limites no contrato acima.
 - Critérios propostos: preservar o balanço do período; indicador acumulado separado e explicitamente limitado aos registros informados; centavos exatos; testes de virada de mês/ano e retroatividade; retiradas sem duplicação em Todos; nenhuma inferência de lucro/saldo bancário ou lançamento sintético duplicado.
@@ -20,9 +20,9 @@ Revalidar cada item no código/versão vigente antes de implementar. Separar nec
 
 - Fonte: F1 seção F, p.3.
 - Necessidade: visualizar também o total de despesas na tela Ano.
-- Situação: proposta funcional, não defeito da soma atual de entradas comerciais.
+- Situação: implementado por Raphael na T10 e integrado pela PR #25, commit `400d126`; 12 testes do módulo anual aprovados na auditoria de `0cacabc`. Ensaio Android permanece em T05. Ver [contrato T10](../colaboracao/T10-DESPESAS-ANUAIS.md). Não reimplementar como proposta ainda ausente.
 - Prioridade sugerida: média; esforço médio.
-- Decisões: Negócio somente ou seleção explícita de âmbito? Apresentação mensal/anual? Saldo descritivo opcional, sem chamar de lucro.
+- Recorte implementado: entradas e despesas comuns do Negócio, por mês e no total do ano; exclui Pessoal e retiradas. Sem indicador novo de lucro, saldo bancário ou diferença entre os totais.
 - Critérios propostos: entradas e despesas externas separadas, ano explícito, retirada apresentada separadamente sem inflar despesa externa, testes de filtro/limites e preservação de interpretação de meses sem informação.
 
 ## MEL-MEI-03 — Lembrete de registrar movimentações

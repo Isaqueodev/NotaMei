@@ -88,3 +88,23 @@ Para fins de ensaio, considera-se o seguinte cenário **puramente hipotético**:
 - [x] Limites claramente registrados
 - [x] Nenhuma alteração em Gradle/pubspec/chaves realizada
 - [ ] Revisado por **Pedro** antes de qualquer ação real de release/publicação
+
+## 9) Registro complementar do candidato de teste — 12/11/2026
+
+O plano e o cenário fictício acima são preservados como entrega original de Matheus na PR #14. Este complemento registra o artefato posteriormente gerado com autorização de Pedro; não transforma o cenário hipotético em ensaio executado nem autoriza publicação ou mudança de chaves.
+
+| Campo | Registro verificado |
+| --- | --- |
+| Código do candidato | `0cacabcfbb3087a7adc23e2ac3f62531319c8940` (`0cacabc`) |
+| Versão no APK | `1.0.0`, build `3`, por argumento de compilação; `pubspec.yaml` continua `1.0.0+1` |
+| Artefato local, fora do Git | `NotaMei_0cacabc_2026-11-12_teste.apk` |
+| Modo de compilação | Release otimizado **de teste**, universal; não confundir modo release com assinatura de produção |
+| Assinatura | Certificado Android Debug, verificado e igual ao APK de teste anterior |
+| Pacote / APIs | `br.edu.notamei.notamei`; mínimo 24, alvo 36 |
+| ABIs | `arm64-v8a`, `armeabi-v7a`, `x86_64` |
+| Tamanho | `63541567` bytes |
+| SHA-256 do APK | `35f8b5a4428cb948fa6f61acd38f16fbee7b3a0a0991447f0827971bfaab7212` |
+| Conferências executadas | Compilação, manifesto, assinatura, ZIP e hash após cópia; sem banco/fixtures privados nos caminhos pesquisados |
+| Instalação/atualização Android desta entrega | **Não executada**; não comprova preservação de registros/preferências |
+
+A validação real de atualização e reabertura fica em T05, no aparelho/ambiente escolhido por Pedro, sem desinstalar ou limpar dados como atalho. Se houver incompatibilidade de assinatura ou downgrade, parar para decisão, não forçar a instalação. Alterações documentais posteriores não recompilam esse APK nem mudam sua identidade. Ver [estado e coordenação](../colaboracao/ESTADO-E-COORDENACAO.md).
