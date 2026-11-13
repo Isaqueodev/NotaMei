@@ -6,8 +6,8 @@
 - **Equipamentos informados por Pedro:** computador **Windows** e celular **iPhone**. Flutter/SDK, acesso a Mac e emulador Android não foram confirmados.
 - **Revisão técnica:** Matheus Rebelo e Pedro Isaque; Pedro decide integração.
 - **Validação Android:** executor a designar por Pedro em T05; não depende de Raphael possuir Android.
-- **Situação:** tarefa atribuída para desenvolvimento; funcionalidade ainda não implementada. Nenhum teste deste contrato foi executado como parte da redistribuição.
-- **Base inspecionada:** `a3e3764`, após sincronização de `main` com `origin/main`. Confirmar novamente branch/HEAD e alterações alheias antes de programar.
+- **Situação atual:** código/testes integrados pela PR #25, commit `400d126`; presentes na base auditada `0cacabc`. Implementação concluída no recorte; validação Android permanece pendente em T05. Não reimplementar.
+- **Base histórica do planejamento:** `a3e3764`; as descrições de código inicial e a tabela da redistribuição abaixo são históricas. **Reconciliação:** 12/11/2026, `0cacabc`. Confirmar branch/HEAD antes de qualquer trabalho futuro.
 - **Origem:** [MEL-MEI-02](../avaliacao/BACKLOG-MELHORIAS.md#mel-mei-02--despesas-no-acompanhamento-anual), questionário F1, seção F, p.3; [síntese da avaliação](../avaliacao/FEEDBACK-MEI-2026-11-04.md). É uma pessoa em dois instrumentos, não uma demanda comprovada de toda a comunidade.
 - **Objetivo:** permitir consultar despesas informadas do Negócio no mesmo acompanhamento anual que hoje apresenta entradas. É evolução funcional, não correção de uma soma de entradas comprovadamente errada.
 
@@ -23,7 +23,7 @@ Ler o [contrato geral](TAREFA-PARA-IA.md) e a [implementação segura](../../.ag
 6. Não calcular saldo acumulado, saldo bancário, lucro, teto fiscal, dívida ou obrigação de pagamento. Não criar indicador de diferença entre entradas e despesas nesta entrega.
 7. Não alterar banco, dados, criação/edição de lançamentos, filtros do Início/Histórico, retirada vinculada, CSV/PDF, notificações, fontes, assinatura ou dependências.
 
-**Dependência financeira delimitada:** MEL-MEI-01 (continuidade entre meses) permanece fora do escopo e não bloqueia o total de despesas anuais. Retiradas já existem; não implementar outra operação Pagar-me nem contabilizá-las como despesas externas.
+**Dependência financeira delimitada:** MEL-MEI-01 (continuidade entre meses) permanece fora do escopo de T10 e foi integrada separadamente pela PR #27, sem saldo inicial manual. Não bloqueia nem substitui despesas anuais. Retiradas já existem; não implementar outra operação Pagar-me nem contabilizá-las como despesas externas.
 
 ## Código existente a preservar
 
@@ -51,7 +51,9 @@ Confirmar os chamadores antes da alteração. Preservar as APIs de entradas e o 
 
 **Leitura, sem edição nesta fatia:** modelos, repositório, `money.dart`, totais de outros módulos e teste `test/finance/withdrawal_totals_test.dart`. Mudanças em arquivos compartilhados, regras, requisitos, banco ou dependências exigem combinar novo escopo com Pedro. Não refatorar tema/global, corrigir tipografia dos colegas ou alterar outros testes para esconder falhas.
 
-## Aceite verificável
+## Critérios originais de aceite
+
+As caixas deste bloco foram preservadas como contrato original, não como status atual de implementação. A evidência de integração está na seção final; aceite Android não foi preenchido sem ensaio.
 
 - [ ] **Total anual:** entradas e despesas comerciais comuns aparecem separadas, com ano e rótulos explícitos.
 - [ ] **Detalhamento:** os doze meses mostram os dois tipos de valor sem confundir ausência de entrada com ausência de despesa. Janeiro e dezembro pertencem ao mesmo recorte civil; registros de outros anos não entram.
@@ -101,7 +103,9 @@ Referências técnicas oficiais para esse recorte: [testes Flutter](https://docs
 4. Executar a validação abaixo e anotar resultado real, inclusive bloqueios. Não inventar contagens ou afirmar aprovação porque o comando foi sugerido.
 5. Solicitar revisão e entregar diff. Pedro coordena o ensaio Android posterior e a integração.
 
-| Comando/cenário | Responsável/ambiente | Execução desta tarefa | Resultado |
+Tabela histórica da redistribuição, anterior à implementação e preservada sem atribuir execuções posteriores a Raphael:
+
+| Comando/cenário | Responsável/ambiente | Execução na redistribuição | Resultado naquele momento |
 | --- | --- | --- | --- |
 | `flutter test test/annual` — baseline | Raphael / computador com Flutter | Não | Pendente |
 | Novo teste mínimo falhando antes do código | Raphael / teste automatizado | Não | Pendente |
@@ -123,3 +127,12 @@ Sem SDK ou dependência disponível, registrar bloqueio e pedir apoio; não subs
 - Ajuste da documentação funcional após revisão, sem declarar o recurso implementado antes do código e dos testes.
 
 **Pronto para revisão de código** e **validado em Android para distribuição** são estados diferentes. Não marcar T10 como concluída apenas por editar este documento.
+
+## Evidência de integração — 12/11/2026
+
+- PR #25 de Raphael integrada; commit `400d126`; arquivos de código e testes em `lib/annual/` e `test/annual/`.
+- Auditoria de integração em `0cacabc`, no ambiente Windows do integrador: **5 testes de resumo e 7 de tela anual aprovados**. Não é alegação de execução no computador de Raphael nem de TDD comprovado por logs dele.
+- Comando direcionado conjunto executado na auditoria: `flutter test --no-pub test/finance/recorded_continuity_test.dart test/finance/recorded_continuity_screen_test.dart test/finance/dashboard_scope_test.dart test/finance/withdrawal_totals_test.dart test/annual --machine`: **37 aprovações**, incluindo os 12 anuais e regressão de retiradas.
+- `flutter analyze --no-pub`: sem problemas. `flutter test --no-pub --machine`: **157 aprovações, 10 erros e 1 falha**. Os mesmos 11 casos não aprovados do baseline limpo de `dd73ea5`, por arquivo/nome, sem casos adicionais. A suíte completa não está aprovada.
+- Nenhum comando Flutter foi reexecutado apenas por escrever esta reconciliação documental; ela referencia a auditoria identificada acima.
+- **Pendência:** ensaio Android pelo executor de T05, em candidato exato, sem atribuir instalação de APK/TalkBack ao iPhone de Raphael. [Estado e coordenação](ESTADO-E-COORDENACAO.md).
