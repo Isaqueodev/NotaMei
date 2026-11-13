@@ -1,13 +1,13 @@
 # NotaMei — matriz de rastreabilidade e plano de verificação
 
-**Revisão documental:** 2026-11-11. **Base:** `9076f3d`. Requisitos em [REQUISITOS-ARQUITETURA.md](../hermes/REQUISITOS-ARQUITETURA.md), vistas em [C4-NOTAMEI.md](C4-NOTAMEI.md), decisões em [ADRs](decisoes/README.md).
+**Origem da matriz:** revisão documental de 2026-11-11, base `9076f3d`. **Reconciliação de status em 12/11/2026:** base `0cacabc`, para T03, T10 e continuidade. Requisitos em [REQUISITOS-ARQUITETURA.md](../hermes/REQUISITOS-ARQUITETURA.md), vistas em [C4-NOTAMEI.md](C4-NOTAMEI.md), decisões em [ADRs](decisoes/README.md). As vistas C4 ainda precisam da manutenção evolutiva descrita no [estado da equipe](../colaboracao/ESTADO-E-COORDENACAO.md); esta reconciliação não as regenera nem altera regras financeiras.
 
 ## 1. Como ler
 
 - **Origem:** contexto de projeto, decisão do responsável ou síntese de feedback; não representa automaticamente uma regra fiscal ou demanda de todos os MEIs.
 - **Estado de código:** presente, parcial ou proposto. Documentação de tarefa não implementa recurso.
 - **Cobertura existente:** caminho de teste inspecionável, não resultado executado nesta revisão.
-- **Execução:** só pode ser preenchida com comando, commit/candidato, ambiente, data e resultado reais. Nesta revisão não foram executados Flutter, ensaios Android, benchmarks ou nova avaliação com participantes.
+- **Execução:** só pode ser preenchida com comando, commit/candidato, ambiente, data e resultado reais. Na revisão original não houve execução Flutter. A auditoria de `0cacabc` em 12/11/2026 executou análise/testes, com síntese no [registro de estado](../colaboracao/ESTADO-E-COORDENACAO.md#verificacao-e-limites); os resultados não são uma nova execução nesta PR documental. Não houve ensaio Android, benchmark ou nova avaliação com participantes nessa auditoria.
 - **RNF:** critérios/ambientes definidos no catálogo; metas novas continuam propostas, não promessas aprovadas de desempenho, disponibilidade ou segurança.
 
 Os nomes BOOT, FIN, ANNUAL, REPO, MONEY, TOTALS, EX, REPORT, OUT, DAS e GATE identificam os elementos da vista C3. Não são serviços HTTP nem camadas independentes formalmente implementadas.
@@ -37,7 +37,7 @@ Os nomes BOOT, FIN, ANNUAL, REPO, MONEY, TOTALS, EX, REPORT, OUT, DAS e GATE ide
 | RF04 | RN04, RN05, RN12, RN23; consulta/correção e par vinculado | ADR-002; FIN, REPO | Presente; [`notamei_finance_test.dart`](../../test/finance/notamei_finance_test.dart), [`withdrawal_ui_test.dart`](../../test/finance/withdrawal_ui_test.dart). |
 | RF05 | Necessidade adicional de gráfico a validar, sem RN nova inferida | Componente futuro a definir; nenhuma decisão de biblioteca aprovada | Não implementado; sem teste de funcionalidade existente a declarar. |
 | RF06 | RN19–RN21; agenda pessoal, não DAS fiscal | ARQ-05; BOOT, DAS, GATE | Agendamento presente; [`das_interaction_test.dart`](../../test/das/das_interaction_test.dart). Entrega futura não comprovada. |
-| RF07 | RN04, RN08, RN09, RN13; entradas comerciais do ano | ADR-003; ANNUAL, MONEY | Presente para entradas; [`annual_summary_test.dart`](../../test/annual/annual_summary_test.dart). T10 é extensão ainda não implementada. |
+| RF07 | RN04, RN08, RN09, RN13; registros comerciais do ano, sem apuração fiscal | ADR-003; ANNUAL, MONEY | Entradas presentes e despesas comuns acrescentadas pela T10/PR #25; Pessoal/retiradas excluídos. [`annual_summary_test.dart`](../../test/annual/annual_summary_test.dart) e [`annual_income_screen_test.dart`](../../test/annual/annual_income_screen_test.dart); 12 testes aprovados na auditoria de `0cacabc`. Etapa Android em T05. |
 | RF08–09 + FB04/FB05 | Agrupamento legado; RN15–RN18 para relatórios | ADR-001/ADR-003; EX, REPORT, OUT | CSV/PDF presentes; [`csv_export_test.dart`](../../test/export/csv_export_test.dart), [`pdf_screen_test.dart`](../../test/export/pdf_screen_test.dart). Metas, comprovantes, fiado e sincronização continuam futuros e sem RF atômicos fechados. |
 | RF10 | Fluxo de primeiro uso opcional, sem regra de domínio adicional inventada | BOOT e onboarding | Presente; [`onboarding_flow_test.dart`](../../test/onboarding/onboarding_flow_test.dart). |
 | FB03 | Captura de compra requer formatos, confirmação e privacidade | Extensão proposta; sem componente de captura atual | Não implementado; requisitos/contrato a definir antes de câmera/consulta externa. |
@@ -51,8 +51,8 @@ Os nomes BOOT, FIN, ANNUAL, REPO, MONEY, TOTALS, EX, REPORT, OUT, DAS e GATE ide
 
 | Origem | Necessidade / relação | Decisão ou ponto de extensão | Tarefa / estado / verificação futura |
 | --- | --- | --- | --- |
-| MEL-MEI-01 | Continuidade entre meses; relaciona RF03/RF07 e RN07–RN09 | FIN/ANNUAL; regra de acumulado ainda não definida | Especificar antes de implementar; testar histórico parcial, retroatividade, virada de ano e internas. Sem saldo inicial ou carry-over automático aprovado. |
-| MEL-MEI-02 | Despesas no Ano, extensão de RF07; RN13 preservada | ANNUAL/MONEY; ADR-003 preservado | [T10 de Raphael](../colaboracao/T10-DESPESAS-ANUAIS.md), atribuída, não implementada; testes no Windows e etapa Android separada. |
+| MEL-MEI-01 | Continuidade entre meses; relaciona RF03 e RN07–RN09 | FIN/TOTALS; projeção dos registros, sem saldo inicial manual nem lançamento sintético | [Recorte autorizado e integrado pela PR #27](../colaboracao/MEL-MEI-01-CONTINUIDADE.md): acumulados anterior/até fim do mês separados do balanço mensal; âmbito, retroatividade e exclusão de internas em Todos. Testes em `test/finance/recorded_continuity*_test.dart`; ensaio Android pendente em T05. |
+| MEL-MEI-02 | Despesas no Ano, extensão de RF07; RN13 preservada | ANNUAL/MONEY; ADR-003 preservado | [T10 de Raphael](../colaboracao/T10-DESPESAS-ANUAIS.md), integrada pela PR #25, commit `400d126`; 12 testes anuais aprovados na auditoria de `0cacabc`, sem atribuir essa execução ao computador de Raphael. Etapa Android pendente em T05. |
 | MEL-MEI-03 | Hábito de registrar; não equivale ao lembrete DAS de RF06 | Novo RF e serviço/gateway a definir; nenhum componente diário atual | Proposta sem tarefa de implementação atribuída; opt-in, horário, cancelamento, fuso e observação nativa precisam de contrato próprio. |
 | MEL-MEI-04 | Compreensão de Pagar-me; FB08/RF04 e RN10–RN14 | FIN/REPO/TOTALS; ADR-002/ADR-003 | Investigar compreensão e versão usada; retestar duas pontas e edição/exclusão sem declarar recurso ausente. Dependência conceitual com MEL-MEI-01. |
 | MEL-MEI-05 | Classificação e descoberta da edição; RF02/RF04/RF10 | FIN/BOOT; conteúdo contextual a especificar | Proposta de usabilidade, sem nova implementação atribuída; reteste consentido com e sem ajuda, sem afirmar aprendizado comprovado. |
