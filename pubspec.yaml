@@ -69,6 +69,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/brand/notamei.png
+    # Used by the PDF renderer; does not change the app's Roboto theme.
+    - assets/fonts/Inter.ttf
     - assets/fonts/Inter-OFL.txt
     - assets/fonts/PlayfairDisplay-OFL.txt
   fonts:
