@@ -69,6 +69,12 @@ void main() {
             find.widgetWithText(ChoiceChip, scope),
             -300,
           );
+          // A rolagem pode reencontrar um filho em cache antes do próximo layout.
+          await tester.pumpAndSettle();
+          expect(
+            find.widgetWithText(ChoiceChip, scope).hitTestable(),
+            findsOneWidget,
+          );
           await tester.tap(find.widgetWithText(ChoiceChip, scope));
           await tester.pumpAndSettle();
           expect(
