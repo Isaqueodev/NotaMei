@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:notamei/data/entry_repository.dart';
@@ -33,7 +34,16 @@ class SequenceRepository extends EntryRepository {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   sqfliteFfiInit();
+  setUpAll(() async {
+    // Use the app's bundled fonts, not Ahem's synthetic layout metrics.
+    final fonts = FontLoader('Roboto');
+    for (final weight in ['Regular', 'Medium', 'Bold']) {
+      fonts.addFont(rootBundle.load('assets/fonts/Roboto-$weight.ttf'));
+    }
+    await fonts.load();
+  });
   late Directory directory;
   late SequenceRepository repository;
   var closed = false;
@@ -103,8 +113,11 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Despesa (Saída)'));
+      final expenseChip = find.widgetWithText(ChoiceChip, 'Despesa (Saída)');
+      expect(expenseChip.hitTestable(), findsOneWidget);
+      await tester.tap(expenseChip);
       await tester.pumpAndSettle();
+      expect(tester.widget<ChoiceChip>(expenseChip).selected, isTrue);
       await tester.enterText(find.byType(TextField).first, '25,00');
       await tester.enterText(find.byType(TextField).last, 'Não perder');
       repository.failNext = true;
