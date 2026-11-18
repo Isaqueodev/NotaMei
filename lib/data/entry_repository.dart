@@ -24,6 +24,17 @@ class EntryRepository extends ChangeNotifier {
 
   List<EntryRecord> get entries => _entries;
 
+  /// Complete immutable history, serialized with mutations. No screen filters.
+  /// Includes prior queued writes and does not wait for writes queued afterwards.
+  Future<List<EntryRecord>> snapshotForBackup() async {
+    late List<EntryRecord> snapshot;
+    await _enqueue(() async {
+      await initialize();
+      snapshot = List<EntryRecord>.unmodifiable(_entries);
+    });
+    return snapshot;
+  }
+
   Future<void> initialize() =>
       _initializing ??= _open().onError((Object error, StackTrace stack) {
         _initializing = null;
