@@ -3,9 +3,9 @@
 ## Estado
 
 Este incremento implementa `BackupCreationService`, a captura serializada de todo o
-histórico e a ligação ao seletor de salvamento já usado no aplicativo. **Ainda não
-há botão de backup nos Ajustes nem restauração do banco.** A integração de interface
-e o aceite em Android continuam pendentes; o serviço está pronto para essa ligação.
+histórico e a ligação ao seletor de salvamento já usado no aplicativo. A
+[interface de criação](INTERFACE-CRIACAO.md) agora está ligada a **Ajustes → Criar backup**.
+**Ainda não há restauração do banco** e o aceite em Android continua pendente.
 
 Não muda schema, registros, preferências, notificações, dependências ou permissões.
 O formato permanece o [contrato financeiro v1](FORMATO-V1.md). JSON é texto legível,
@@ -71,7 +71,7 @@ interpretar o caminho retornado pelo plugin como um `File` local seguro para lei
 
 Uma falha do salvamento também não garante que nenhum arquivo parcial tenha sido
 criado pelo provedor. Não remover nem sobrescrever destinos por inferência. A
-interface futura precisa explicar dados legíveis, cancelamento/erros e limites,
+interface de criação explica dados legíveis, cancelamento/erros e limites,
 sem afirmar integridade não verificada. Confirmar o arquivo pelo seletor e exercer
 sua leitura no aparelho fazem parte do aceite nativo pendente.
 
@@ -99,4 +99,4 @@ cópia sintética para conferência independente; não altera o serviço de prod
 - Definir substituir/mesclar e eventual senha/inclusão de preferências; não foram
   decididas por este serviço.
 - Restauração transacional com validação de domínio e proteção dos dados anteriores.
-- Integrar Ajustes com estados de progresso/avisos/erros e validar no Android real.
+- A criação já está integrada em Ajustes com progresso/avisos/erros; ainda falta validar no Android real e integrar leitura/restauração.
