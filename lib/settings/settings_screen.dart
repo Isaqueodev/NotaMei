@@ -10,12 +10,14 @@ class SettingsScreen extends StatelessWidget {
     this.reminderWarning,
     this.onExportCsv,
     this.onExportPdf,
+    this.onCreateBackup,
     this.themeMode = ThemeMode.system,
     this.onThemeModeChanged,
   });
 
   final VoidCallback? onExportCsv;
   final VoidCallback? onExportPdf;
+  final VoidCallback? onCreateBackup;
   final VoidCallback onOpenTour;
   final VoidCallback onConfigureDas;
   final bool dasEnabled;
@@ -80,6 +82,17 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const _SectionTitle('Dados e avisos'),
+          if (onCreateBackup != null) ...[
+            _Sheet(
+              child: _SettingRow(
+                icon: Icons.backup_outlined,
+                title: 'Criar backup',
+                subtitle: 'Cópia completa em JSON, sem senha. Restauração ainda indisponível.',
+                onTap: onCreateBackup,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (onExportCsv != null) ...[
             _Sheet(
               child: _SettingRow(
@@ -113,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           const _Notice(
-            text: 'Limpar os dados ou desinstalar o app pode apagar seu histórico. Não há backup próprio nem restauração pelo NotaMei nesta versão.',
+            text: 'Limpar os dados ou desinstalar o app pode apagar seu histórico. Guarde suas cópias com cuidado; a restauração pelo NotaMei ainda não está disponível.',
           ),
           const SizedBox(height: 12),
           const _Notice(
