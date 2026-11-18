@@ -39,7 +39,7 @@ void main() {
         final loss = find.textContaining('Limpar os dados ou desinstalar');
         await tester.scrollUntilVisible(loss, 250);
         expect(loss, findsOneWidget);
-        expect(find.textContaining('Não há backup próprio'), findsOneWidget);
+        expect(find.textContaining('restauração pelo NotaMei ainda não está disponível'), findsOneWidget);
         final lossText = tester.widget<Text>(loss);
         expect(lossText.style?.color, isNot(NotaMeiTheme.expense));
         final brand = find.byType(Image);

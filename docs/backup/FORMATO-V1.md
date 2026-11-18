@@ -4,12 +4,13 @@
 
 Implementado em `lib/backup/financial_backup.dart`: serialização e validação puras,
 sem I/O, acesso ao SQLite ou dependências novas. `encode` produz bytes; `decode`
-produz um `FinancialBackup` com lista imutável. **Ainda não existe uma ação de
-criar/restaurar backup nos Ajustes.** Este contrato não torna CSV/PDF restauráveis.
+produz um `FinancialBackup` com lista imutável. A [ação de criação](INTERFACE-CRIACAO.md)
+agora está ligada aos Ajustes; **ainda não há restauração pelo app**. Este contrato
+não torna CSV/PDF restauráveis.
 
 A etapa seguinte acrescenta o [serviço de criação e saída nativa](CRIACAO.md),
 com captura enfileirada do histórico completo, cancelamento e tratamento de erros,
-ainda sem integração de interface ou restauração. O codec deste documento continua puro.
+com a interface de criação integrada e restauração pendente. O codec deste documento continua puro.
 
 O núcleo trabalha apenas com lançamentos financeiros. Preferências, notificações,
 senha, criptografia e substituição/mesclagem continuam fora deste contrato.
@@ -98,8 +99,8 @@ mescla ou corrige dados automaticamente.
 1. **Serviço implementado:** captura enfileirada do histórico completo, sem filtros
    de mês/ano, âmbito ou tipo. O codec isolado não sabe se o chamador omitiu registros.
 2. **Fronteira nativa implementada e testada com canal simulado:** prepara bytes e
-   chama o seletor com cancelamento/erros; faltam interface, aviso de dados legíveis
-   e aceite Android. Retorno nativo de gravação não é releitura independente do arquivo;
+   chama o seletor com cancelamento/erros e está ligada à interface de criação com
+   aviso de dados legíveis; falta aceite Android. Retorno nativo de gravação não é releitura independente do arquivo;
    não anunciar integridade garantida nem sobrescrever destinos por inferência.
 3. **Leitor e dados de prévia implementados:** [leitura limitada por stream ou arquivo local](LEITURA-PREVIA.md), com validação e metadados imutáveis. Ainda faltam origem nativa Android, apresentação e confirmação. Definir explicitamente substituir versus mesclar e eventual proteção por senha; este contrato não decide essas políticas.
 4. Implementar restauração transacional com validação de domínio, tratamento de
