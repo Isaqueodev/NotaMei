@@ -78,6 +78,7 @@ lib/annual/      Acompanhamento anual descritivo
 lib/das/         Configuração e agendamento de lembretes
 lib/data/        Modelo e persistência dos lançamentos
 lib/export/      Seleção/prévia comum, geradores CSV/PDF e gateway nativo
+lib/backup/      Formato financeiro versionado e validação pura (sem fluxo de arquivos/restauração)
 test/            Testes automatizados por área
 ```
 
@@ -106,7 +107,9 @@ Consulte o [recorte implementado, validações e limites do V5](docs/hermes/V5-I
 
 ## Estado do projeto
 
-Esta versão cobre o fluxo local de apresentação, uso manual e **relatórios CSV/PDF**, acessíveis em Ajustes. **Backup/restauração próprios, sincronização, integrações externas e regras fiscais automáticas não estão implementados**. Relatórios não são restauráveis nem documentos fiscais. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
+Esta versão cobre o fluxo local de apresentação, uso manual e **relatórios CSV/PDF**, acessíveis em Ajustes. **Os fluxos de backup/restauração próprios, sincronização, integrações externas e regras fiscais automáticas não estão implementados**. Relatórios não são restauráveis nem documentos fiscais. Documentos de pesquisa individual e referências visuais de terceiros são materiais locais ignorados pelo Git e não fazem parte da distribuição do aplicativo.
+
+**Backup em desenvolvimento:** o primeiro incremento acrescenta apenas o [núcleo e contrato financeiro v1](docs/backup/FORMATO-V1.md), com serialização e validação testáveis. Ainda não há ação de salvar/restaurar nos Ajustes nem escrita do codec no banco. O formato é JSON legível, sem senha/criptografia; preferências e políticas de restauração continuam pendentes.
 
 Para continuar o desenvolvimento com o Hermes Agent em outro computador, consulte [as instruções de migração para Windows](docs/hermes/IMPORTAR-WINDOWS.md) e a [síntese compartilhável de requisitos e arquitetura](docs/hermes/REQUISITOS-ARQUITETURA.md). Elas transferem apenas conhecimento revisado e não incluem respostas individuais da pesquisa, conversas ou credenciais.
 
