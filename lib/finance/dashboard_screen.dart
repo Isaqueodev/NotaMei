@@ -174,18 +174,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 16),
                   LayoutBuilder(
                     builder: (context, constraints) {
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final incomeCardColor =
+                          isDark ? NotaMeiTheme.income : NotaMeiTheme.incomeDark;
+                      final expenseCardColor =
+                          isDark ? NotaMeiTheme.expense : NotaMeiTheme.expenseDark;
                       final items = [
                         _summaryItem(
                           'Entradas',
                           totalsOverflow ? '—' : formatMoney(income),
                           Icons.add,
-                          NotaMeiTheme.incomeDark,
+                          incomeCardColor,
                         ),
                         _summaryItem(
                           'Saídas',
                           totalsOverflow ? '—' : formatMoney(expense),
                           Icons.remove,
-                          NotaMeiTheme.expenseDark,
+                          expenseCardColor,
                         ),
                       ];
                       if (constraints.maxWidth /
