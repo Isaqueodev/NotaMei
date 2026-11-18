@@ -101,9 +101,7 @@ mescla ou corrige dados automaticamente.
    chama o seletor com cancelamento/erros; faltam interface, aviso de dados legíveis
    e aceite Android. Retorno nativo de gravação não é releitura independente do arquivo;
    não anunciar integridade garantida nem sobrescrever destinos por inferência.
-3. Ler com limites antes de alocar todo arquivo, validar, apresentar prévia e
-   obter confirmação. Definir explicitamente substituir versus mesclar e eventual
-   proteção por senha; este contrato não decide essas políticas.
+3. **Leitor e dados de prévia implementados:** [leitura limitada por stream ou arquivo local](LEITURA-PREVIA.md), com validação e metadados imutáveis. Ainda faltam origem nativa Android, apresentação e confirmação. Definir explicitamente substituir versus mesclar e eventual proteção por senha; este contrato não decide essas políticas.
 4. Implementar restauração transacional com validação de domínio, tratamento de
    falhas e proteção dos dados anteriores; depois integrar Ajustes e validar no Android.
 
