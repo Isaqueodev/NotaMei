@@ -95,7 +95,7 @@ cópia sintética para conferência independente; não altera o serviço de prod
 
 ## Próximos incrementos
 
-- Leitura nativa com limite antes de carregar o arquivo, validação e prévia.
+- [Leitor limitado e dados de prévia](LEITURA-PREVIA.md) implementados para stream/arquivo local; ainda faltam origem nativa Android e tela de prévia.
 - Definir substituir/mesclar e eventual senha/inclusão de preferências; não foram
   decididas por este serviço.
 - Restauração transacional com validação de domínio e proteção dos dados anteriores.
