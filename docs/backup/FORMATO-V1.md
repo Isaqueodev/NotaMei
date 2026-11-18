@@ -7,9 +7,14 @@ sem I/O, acesso ao SQLite ou dependências novas. `encode` produz bytes; `decode
 produz um `FinancialBackup` com lista imutável. **Ainda não existe uma ação de
 criar/restaurar backup nos Ajustes.** Este contrato não torna CSV/PDF restauráveis.
 
+A etapa seguinte acrescenta o [serviço de criação e saída nativa](CRIACAO.md),
+com captura enfileirada do histórico completo, cancelamento e tratamento de erros,
+ainda sem integração de interface ou restauração. O codec deste documento continua puro.
+
 O núcleo trabalha apenas com lançamentos financeiros. Preferências, notificações,
-senha, criptografia, substituição/mesclagem e localização do arquivo continuam fora
-deste incremento. JSON é texto legível: não há confidencialidade, assinatura,
+senha, criptografia e substituição/mesclagem continuam fora deste contrato.
+A escolha de destino pertence ao serviço/gateway, não ao codec.
+JSON é texto legível: não há confidencialidade, assinatura,
 autenticação ou garantia de detecção de adulteração.
 
 ## Envelope
@@ -88,13 +93,14 @@ mescla ou corrige dados automaticamente.
   conflito com registros existentes ou todos os limites de totais por mês/ano.
   Essas verificações precisam integrar a futura restauração antes de qualquer escrita.
 
-## Integração futura, ainda pendente
+## Estado da integração e pendências
 
-1. Capturar o histórico completo e consistente do repositório, sem filtros de
-   mês/ano, âmbito ou tipo da tela. O codec não sabe se o chamador omitiu registros.
-2. Escolher destino e salvar os bytes com cancelamento/erros e aviso de dados
-   legíveis; não anunciar criação sem verificar a saída. Não sobrescrever arquivos
-   existentes por inferência.
+1. **Serviço implementado:** captura enfileirada do histórico completo, sem filtros
+   de mês/ano, âmbito ou tipo. O codec isolado não sabe se o chamador omitiu registros.
+2. **Fronteira nativa implementada e testada com canal simulado:** prepara bytes e
+   chama o seletor com cancelamento/erros; faltam interface, aviso de dados legíveis
+   e aceite Android. Retorno nativo de gravação não é releitura independente do arquivo;
+   não anunciar integridade garantida nem sobrescrever destinos por inferência.
 3. Ler com limites antes de alocar todo arquivo, validar, apresentar prévia e
    obter confirmação. Definir explicitamente substituir versus mesclar e eventual
    proteção por senha; este contrato não decide essas políticas.
