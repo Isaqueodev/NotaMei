@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-/// Bytes and metadata ready for a native save/share action, not a database backup.
+/// Bytes and metadata for native save/share. The producer defines the format;
+/// this transport container neither creates nor restores database records.
 class ExportDocument {
   ExportDocument({
     required Uint8List bytes,
