@@ -5,7 +5,7 @@
 Este incremento implementa `BackupCreationService`, a captura serializada de todo o
 histórico e a ligação ao seletor de salvamento já usado no aplicativo. A
 [interface de criação](INTERFACE-CRIACAO.md) agora está ligada a **Ajustes → Criar backup**.
-**Ainda não há restauração do banco** e o aceite em Android continua pendente.
+Há [importação aditiva do JSON](IMPORTACAO.md), sem substituir o histórico ou restaurar preferências; o aceite em Android continua pendente.
 
 Não muda schema, registros, preferências, notificações, dependências ou permissões.
 O formato permanece o [contrato financeiro v1](FORMATO-V1.md). JSON é texto legível,
@@ -93,10 +93,9 @@ não usa registros reais e não comprova funcionamento do seletor em um telefone
 A variável opcional `NOTAMEI_BACKUP_EVIDENCE_DIR`, somente no teste, preserva uma
 cópia sintética para conferência independente; não altera o serviço de produção.
 
-## Próximos incrementos
+## Integração atual e pendências
 
-- [Leitor limitado e dados de prévia](LEITURA-PREVIA.md) implementados para stream/arquivo local; ainda faltam origem nativa Android e tela de prévia.
-- Definir substituir/mesclar e eventual senha/inclusão de preferências; não foram
-  decididas por este serviço.
-- Restauração transacional com validação de domínio e proteção dos dados anteriores.
-- A criação já está integrada em Ajustes com progresso/avisos/erros; ainda falta validar no Android real e integrar leitura/restauração.
+- [Leitura limitada](LEITURA-PREVIA.md) integrada ao seletor Android e à [prévia/importação](IMPORTACAO.md).
+- Política aprovada: adicionar sem apagar; IDs idênticos ignorados; qualquer conflito bloqueia o arquivo inteiro.
+- Importação usa transação e não restaura preferências. Não existe substituição integral, senha ou sincronização.
+- Ainda falta aceite dos seletores, arquivos no provedor e recursos assistivos no Android real.

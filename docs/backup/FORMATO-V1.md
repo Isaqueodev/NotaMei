@@ -5,12 +5,12 @@
 Implementado em `lib/backup/financial_backup.dart`: serialização e validação puras,
 sem I/O, acesso ao SQLite ou dependências novas. `encode` produz bytes; `decode`
 produz um `FinancialBackup` com lista imutável. A [ação de criação](INTERFACE-CRIACAO.md)
-agora está ligada aos Ajustes; **ainda não há restauração pelo app**. Este contrato
+está ligada aos Ajustes, assim como a [importação aditiva](IMPORTACAO.md). Este contrato
 não torna CSV/PDF restauráveis.
 
 A etapa seguinte acrescenta o [serviço de criação e saída nativa](CRIACAO.md),
 com captura enfileirada do histórico completo, cancelamento e tratamento de erros,
-com a interface de criação integrada e restauração pendente. O codec deste documento continua puro.
+com interface de criação integrada. O codec deste documento continua puro; a importação e suas políticas ficam fora dele.
 
 O núcleo trabalha apenas com lançamentos financeiros. Preferências, notificações,
 senha, criptografia e substituição/mesclagem continuam fora deste contrato.
@@ -92,7 +92,7 @@ mescla ou corrige dados automaticamente.
   não há checksum autenticado ou proteção criptográfica neste incremento.
 - A validação cobre formato, registros e vínculos, **não** autorização de restaurar,
   conflito com registros existentes ou todos os limites de totais por mês/ano.
-  Essas verificações precisam integrar a futura restauração antes de qualquer escrita.
+  A [importação](IMPORTACAO.md) acrescenta essas verificações antes de qualquer escrita.
 
 ## Estado da integração e pendências
 
@@ -102,9 +102,8 @@ mescla ou corrige dados automaticamente.
    chama o seletor com cancelamento/erros e está ligada à interface de criação com
    aviso de dados legíveis; falta aceite Android. Retorno nativo de gravação não é releitura independente do arquivo;
    não anunciar integridade garantida nem sobrescrever destinos por inferência.
-3. **Leitor e dados de prévia implementados:** [leitura limitada por stream ou arquivo local](LEITURA-PREVIA.md), com validação e metadados imutáveis. Ainda faltam origem nativa Android, apresentação e confirmação. Definir explicitamente substituir versus mesclar e eventual proteção por senha; este contrato não decide essas políticas.
-4. Implementar restauração transacional com validação de domínio, tratamento de
-   falhas e proteção dos dados anteriores; depois integrar Ajustes e validar no Android.
+3. **Leitura e prévia integradas:** [leitor limitado](LEITURA-PREVIA.md), seletor Android por URI e apresentação/confirmação em Ajustes. A política aprovada é adicionar sem apagar, ignorar IDs idênticos e bloquear conflitos; senha não foi implementada.
+4. **Importação transacional implementada:** [validação e gravação aditiva](IMPORTACAO.md), com revalidação da prévia e rollback. Substituição integral e preferências permanecem fora do escopo; aceite em aparelho continua pendente.
 
 ## Verificação automatizada
 

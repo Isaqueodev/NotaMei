@@ -66,8 +66,8 @@ void main() {
             ),
           ),
         );
-        await reveal(tester, find.textContaining('restauração ainda não'));
-        expect(find.textContaining('restauração ainda não'), findsOneWidget);
+        await reveal(tester, find.textContaining('importação não substitui'));
+        expect(find.textContaining('importação não substitui'), findsOneWidget);
         await reveal(tester, find.byKey(const Key('backup-consent')));
         expect(
           find.byKey(const Key('backup-consent')).hitTestable(),
@@ -264,7 +264,7 @@ void main() {
     expect(calls, 0);
     await reveal(tester, find.textContaining('sem senha').first);
     expect(find.textContaining('sem senha'), findsWidgets);
-    expect(find.textContaining('restauração ainda não'), findsOneWidget);
+    expect(find.textContaining('importação não substitui'), findsOneWidget);
     await reveal(tester, find.byKey(const Key('backup-consent')));
     await tester.tap(find.byKey(const Key('backup-consent')));
     await tester.pumpAndSettle();
