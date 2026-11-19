@@ -4,8 +4,7 @@
 
 `BackupInspectionService` lê um `Stream<List<int>>` ou um `File` local, valida o
 conteúdo pelo codec financeiro v1 e retorna um `BackupInspection` imutável.
-**Não há seletor de abertura, tela de prévia nos Ajustes ou restauração neste
-incremento.** O serviço não recebe repositório, não escreve no banco nem modifica,
+O leitor é usado pela [importação aditiva em Ajustes](IMPORTACAO.md), com seletor Android e confirmação. O serviço de leitura isolado não recebe repositório, não escreve no banco nem modifica,
 remove ou renomeia o arquivo de origem.
 
 Este recorte continua o [serviço de criação](CRIACAO.md), sem alterar o
@@ -22,9 +21,7 @@ final inspectionFromStream = await reader.inspectStream(fluxoDeBytes);
 
 O chamador fornece a origem. Não tratar o caminho retornado pelo plugin de
 salvamento como `File` local nem converter uma URI `content://` em caminho por
-concatenação. A futura integração Android precisa oferecer uma origem limitada
-antes de carregar/copiar o arquivo inteiro; este incremento não chama `pickFile`
-nem garante limites sobre caches criados por outros componentes.
+concatenação. A integração Android usa `ContentResolver.openInputStream` e `BackupInputReader`, com limite antes de acumular os bytes e sem copiar para cache. O leitor Dart continua independente dessa origem; não garante limites sobre caches criados por outros componentes.
 
 ## Limites e integridade da leitura
 
@@ -67,17 +64,14 @@ A prévia não calcula saldo, não certifica somas agregadas suportadas por mês
 conflitos com a base atual, autenticidade ou compatibilidade de uma futura política
 de restauração. JSON continua legível, sem senha/criptografia/autenticação.
 
-## Falhas e integração futura
+## Falhas e integração
 
 `BackupInspectionException` distingue `tooLarge`, `invalid` e `read`, com mensagens
 constantes, sem reter o conteúdo, caminho ou exceção original. Não existe resultado
 parcial aproveitável após falha. O leitor é sem estado; uma nova leitura pode ser
 feita após erro, com uma nova origem legível.
 
-A futura confirmação/restauração deve usar o mesmo snapshot validado mostrado na
-prévia, não reler silenciosamente o caminho e aplicar outro conteúdo. Ainda faltam
-entrada nativa Android, interface acessível, definição explícita de substituir ou
-mesclar, validação agregada de domínio e escrita transacional com recuperação.
+A [importação](IMPORTACAO.md) usa o mesmo snapshot validado mostrado na prévia, sem reler silenciosamente a origem. A política aditiva foi aprovada explicitamente: não apagar, ignorar IDs idênticos e bloquear conflitos. A confirmação revalida o histórico dentro da transação; se ele mudou, exige nova seleção. Aceite Android e acessibilidade nativa continuam pendentes.
 
 ## Verificação
 

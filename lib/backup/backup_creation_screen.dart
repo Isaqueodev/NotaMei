@@ -78,7 +78,7 @@ class _BackupCreationScreenState extends State<BackupCreationScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'A restauração ainda não está disponível no aplicativo. Guardar o arquivo não substitui os dados atuais nem é garantia de recuperação nesta versão.',
+              'A importação não substitui nem apaga registros existentes. Em Ajustes, use Importar backup. A cópia não restaura configurações nem garante recuperação contra toda falha.',
             ),
             const SizedBox(height: 16),
             const Text(

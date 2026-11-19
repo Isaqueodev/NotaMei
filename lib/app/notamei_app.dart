@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../annual/annual_income_screen.dart';
 import '../backup/backup_creation_screen.dart';
+import '../backup/backup_import_screen.dart';
 import '../das/das_reminder_service.dart';
 import '../das/das_settings_screen.dart';
 import '../data/entry_record.dart';
@@ -134,6 +135,12 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
     );
   }
 
+  void _openBackupImport() {
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute<void>(builder: (_) => BackupImportScreen(repository: widget.repository)),
+    );
+  }
+
   void _openBackup() {
     _navigatorKey.currentState?.push(
       MaterialPageRoute<void>(
@@ -186,6 +193,7 @@ class _NotaMeiAppState extends State<NotaMeiApp> {
           onExportCsv: _openExport,
           onExportPdf: () => _openExport(format: ExportFormat.pdf),
           onCreateBackup: _openBackup,
+          onImportBackup: _openBackupImport,
           onConfigureDas: _openDas,
           dasEnabled: widget.dasService.enabled,
           reminderWarning: widget.reminderWarning,

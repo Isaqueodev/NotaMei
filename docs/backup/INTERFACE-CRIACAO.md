@@ -3,8 +3,7 @@
 ## Disponível neste incremento
 
 `Ajustes → Criar backup` abre `BackupCreationScreen`, ligada ao serviço de criação
-já implementado. **A criação de arquivo está integrada à interface; restauração,
-abertura de arquivo e tela de prévia de leitura continuam indisponíveis.**
+já implementado. A [importação aditiva](IMPORTACAO.md) também está integrada em Ajustes, com abertura, prévia e confirmação; não substitui o histórico nem restaura configurações.
 
 O aplicativo não cria cópias em segundo plano e não pede senha nova por inferência.
 O JSON é legível, sem senha/criptografia/autenticação, e inclui todas as observações.
@@ -14,14 +13,13 @@ Nenhum dado, preferência, schema, dependência ou permissão é alterado pela c
 
 1. Abra **Ajustes → Criar backup**.
 2. Leia os avisos: todo o histórico de Negócio/Pessoal, sem filtros; registros,
-   observações e pares de retirada; dados legíveis; restauração ainda não disponível.
+   observações e pares de retirada; dados legíveis; importação não substitui nem apaga registros.
 3. Marque **Entendi que a cópia inclui todos os dados e observações, sem senha.**
    A ação fica desabilitada até essa ciência. A marcação não é persistida e reinicia
    desmarcada ao abrir uma nova tela.
 4. Toque em **Escolher local e salvar** e escolha o destino no seletor do sistema.
 5. Aguarde o resultado e confira o arquivo no destino escolhido. Cancelar não é
-   informado como sucesso. A cópia não habilita recuperação pelo app nesta versão:
-   não desinstale nem limpe os dados presumindo que a restauração já existe.
+   informado como sucesso. Confira a cópia antes de depender dela e use a importação em Ajustes para adicionar registros. Não limpe dados para contornar conflitos; configurações não são restauradas.
 
 São mantidos os limites do [formato v1](FORMATO-V1.md): 10 MiB e 10.000 linhas,
 contando cada ponta da retirada. Não existe truncamento ou seleção parcial nesta tela.
@@ -47,7 +45,7 @@ CSV/PDF continuam relatórios separados; não se tornam restauráveis.
 
 A tela não mostra uma prévia de conteúdo baseada em `prepare()` para depois salvar
 um snapshot diferente. Apenas explica o escopo completo; a [inspeção limitada e seus
-metadados](LEITURA-PREVIA.md) continuam sem interface de leitura/restauração.
+metadados](LEITURA-PREVIA.md) são usados na tela separada de [importação](IMPORTACAO.md).
 
 ## Validação e limites de evidência
 
@@ -74,7 +72,5 @@ existente em Downloads.
 
 ## Pendências separadas
 
-- Entrada nativa limitada para arquivo existente e tela de prévia de leitura.
-- Definir explicitamente substituir ou mesclar, eventual senha e preferências.
-- Validação agregada/conflitos e restauração transacional com proteção dos dados.
+- Substituição integral, senha e restauração de preferências não foram implementadas; a importação é somente aditiva.
 - Aceite Android de criação, cancelamento, erros e persistência do documento real.
