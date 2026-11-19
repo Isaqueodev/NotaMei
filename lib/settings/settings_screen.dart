@@ -11,6 +11,7 @@ class SettingsScreen extends StatelessWidget {
     this.onExportCsv,
     this.onExportPdf,
     this.onCreateBackup,
+    this.onImportBackup,
     this.themeMode = ThemeMode.system,
     this.onThemeModeChanged,
   });
@@ -18,6 +19,7 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback? onExportCsv;
   final VoidCallback? onExportPdf;
   final VoidCallback? onCreateBackup;
+  final VoidCallback? onImportBackup;
   final VoidCallback onOpenTour;
   final VoidCallback onConfigureDas;
   final bool dasEnabled;
@@ -82,12 +84,23 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const _SectionTitle('Dados e avisos'),
+          if (onImportBackup != null) ...[
+            _Sheet(
+              child: _SettingRow(
+                icon: Icons.file_open_outlined,
+                title: 'Importar backup',
+                subtitle: 'Adicionar registros de JSON sem apagar; idênticos ignorados e conflitos bloqueados.',
+                onTap: onImportBackup,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (onCreateBackup != null) ...[
             _Sheet(
               child: _SettingRow(
                 icon: Icons.backup_outlined,
                 title: 'Criar backup',
-                subtitle: 'Cópia completa em JSON, sem senha. Restauração ainda indisponível.',
+                subtitle: 'Cópia completa em JSON, sem senha. Importação aditiva disponível.',
                 onTap: onCreateBackup,
               ),
             ),
@@ -126,7 +139,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           const _Notice(
-            text: 'Limpar os dados ou desinstalar o app pode apagar seu histórico. Guarde suas cópias com cuidado; a restauração pelo NotaMei ainda não está disponível.',
+            text: 'Limpar os dados ou desinstalar o app pode apagar seu histórico. Guarde e confira suas cópias: a importação adiciona registros sem apagar, mas configurações não são restauradas.',
           ),
           const SizedBox(height: 12),
           const _Notice(

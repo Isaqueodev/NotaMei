@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqflite.dart' as sqlite;
 
+import '../backup/backup_import_plan.dart';
+import '../backup/financial_backup.dart';
 import '../annual/annual_summary.dart';
 import 'entry_record.dart';
 import 'entry_totals.dart';
@@ -33,6 +35,68 @@ class EntryRepository extends ChangeNotifier {
       snapshot = List<EntryRecord>.unmodifiable(_entries);
     });
     return snapshot;
+  }
+
+  Future<BackupImportPlan> previewBackupImport(FinancialBackup backup) async {
+    try {
+      late BackupImportPlan plan;
+      await _enqueue(() async {
+        await initialize();
+        plan = BackupImportPlan.prepare(await _read(_database!), backup);
+      });
+      return plan;
+    } on BackupImportException {
+      rethrow;
+    } catch (_) {
+      throw const BackupImportException(BackupImportFailure.storage);
+    }
+  }
+
+  Future<BackupImportPlan> importBackup(BackupImportPlan plan) async {
+    if (plan.conflictCount > 0) {
+      throw const BackupImportException(BackupImportFailure.conflict);
+    }
+    try {
+      await _enqueue(() async {
+        await initialize();
+        final snapshot = await _database!.transaction((txn) async {
+          final current = await _read(txn);
+          final prior = {for (final entry in plan.before) entry.id: entry};
+          if (current.length != prior.length ||
+              current.any(
+                (e) =>
+                    prior[e.id] == null || !sameBackupRecord(e, prior[e.id]!),
+              )) {
+            throw const BackupImportException(BackupImportFailure.stale);
+          }
+          // Revalidate under the write transaction, not against a stale UI cache.
+          final checked = BackupImportPlan.prepare(current, plan.backup);
+          if (checked.conflictCount > 0) {
+            throw const BackupImportException(BackupImportFailure.conflict);
+          }
+          for (final entry in checked.additions) {
+            await txn.insert('entries', {
+              'id': entry.id,
+              'type': entry.type.name,
+              'scope': entry.scope.name,
+              'amount_cents': entry.amountCents,
+              'category': entry.category,
+              'date': entry.date.toIso8601String(),
+              'note': entry.note,
+              'withdrawal_id': entry.withdrawalId,
+            });
+          }
+          return _read(txn);
+        });
+        _entries = snapshot;
+        if (plan.addedCount > 0) notifyListeners();
+      });
+      return plan;
+    } on BackupImportException {
+      rethrow;
+    } catch (_) {
+      throw const BackupImportException(BackupImportFailure.storage);
+    }
   }
 
   Future<void> initialize() =>
