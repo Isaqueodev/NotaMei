@@ -9,6 +9,9 @@
 /.env
 *.jks
 *.keystore
+*.p12
+*.pfx
+*.hprof
 /hermes-*-aprendizado-*.zip
 
 # Flutter/Android generated files
@@ -26,6 +29,7 @@
 .pub-cache/
 .pub/
 /build/
+/android/build/
 /coverage/
 /android/app/debug/
 /android/app/profile/
