@@ -5,24 +5,43 @@ import 'package:notamei/theme/notamei_theme.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  test('brand and both fonts are bundled for offline rendering', () async {
+  test('marca, Roboto e fonte do PDF estão disponíveis offline', () async {
     for (final asset in [
       'assets/brand/notamei.png',
       'assets/fonts/Inter.ttf',
-      'assets/fonts/PlayfairDisplay.ttf',
+      'assets/fonts/Roboto-Regular.ttf',
+      'assets/fonts/Roboto-Medium.ttf',
+      'assets/fonts/Roboto-Bold.ttf',
     ]) {
-      expect((await rootBundle.load(asset)).lengthInBytes, greaterThan(1000));
+      expect(
+        (await rootBundle.load(asset)).lengthInBytes,
+        greaterThan(1000),
+        reason: asset,
+      );
     }
   });
-  test('V5 uses paper, ink, local editorial fonts and flat surfaces', () {
-    final theme = NotaMeiTheme.data;
-    expect(theme.scaffoldBackgroundColor, const Color(0xFFFAF8F5));
-    expect(theme.colorScheme.primary, const Color(0xFF1E1735));
-    expect(theme.textTheme.bodyLarge?.fontFamily, 'Inter');
-    expect(theme.textTheme.headlineSmall?.fontFamily, 'Playfair Display');
-    expect(theme.textTheme.bodyLarge?.fontSize, 16);
-    expect(theme.cardTheme.elevation, 0);
-    expect(theme.navigationBarTheme.backgroundColor, Colors.white);
-    expect(theme.navigationBarTheme.elevation, 0);
-  });
+
+  for (final dark in [false, true]) {
+    test('tema ${dark ? 'escuro' : 'claro'} usa Roboto e a paleta atual', () {
+      final theme = dark ? NotaMeiTheme.darkData : NotaMeiTheme.data;
+      expect(theme.brightness, dark ? Brightness.dark : Brightness.light);
+      expect(
+        theme.scaffoldBackgroundColor,
+        dark ? const Color(0xFF0F1420) : const Color(0xFFF4F7FA),
+      );
+      expect(
+        theme.colorScheme.primary,
+        dark ? const Color(0xFF9BB4FF) : const Color(0xFF142D4E),
+      );
+      expect(
+        theme.colorScheme.surface,
+        dark ? const Color(0xFF151B2B) : Colors.white,
+      );
+      expect(theme.textTheme.bodyLarge?.fontFamily, 'Roboto');
+      expect(theme.textTheme.headlineSmall?.fontFamily, 'Roboto');
+      expect(theme.textTheme.bodyLarge?.fontSize, 16);
+      expect(theme.cardTheme.color, theme.colorScheme.surface);
+      expect(theme.cardTheme.elevation, 0);
+    });
+  }
 }

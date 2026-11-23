@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notamei/onboarding/onboarding_flow.dart';
 import 'package:notamei/theme/notamei_theme.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    final loader = FontLoader('Roboto')
+      ..addFont(rootBundle.load('assets/fonts/Roboto-Regular.ttf'))
+      ..addFont(rootBundle.load('assets/fonts/Roboto-Medium.ttf'))
+      ..addFont(rootBundle.load('assets/fonts/Roboto-Bold.ttf'));
+    await loader.load();
+  });
+
   testWidgets(
     'folha do tour alinha descrição e valor em 390px sem reduzir texto',
     (tester) async {
@@ -58,7 +68,7 @@ void main() {
       final heading = tester.widget<Text>(
         find.text('Seu negócio mais claro,\num registro de cada vez.'),
       );
-      expect(heading.style?.fontFamily, 'Playfair Display');
+      expect(heading.style?.fontFamily, 'Roboto');
       await tester.ensureVisible(find.text('Ver como funciona'));
       await tester.tap(find.text('Ver como funciona'));
       await tester.pumpAndSettle();
