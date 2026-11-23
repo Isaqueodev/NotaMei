@@ -384,6 +384,8 @@ void main() {
   testWidgets(
     'painel e histórico identificam internas, filtros independentes e texto 2x',
     (tester) async {
+      var editCalls = 0;
+      String? editedEntryId;
       try {
         tester.view.physicalSize = const Size(390, 844);
         tester.view.devicePixelRatio = 1;
@@ -413,6 +415,8 @@ void main() {
               repository: repo,
               onEdit: (e) {
                 expect(e.isWithdrawal, isTrue);
+                editCalls++;
+                editedEntryId = e.id;
               },
             ),
             scale: 2,
@@ -432,7 +436,11 @@ void main() {
         );
         expect(find.text('Retirada do titular'), findsOneWidget);
         await tester.ensureVisible(find.text('Retirada do titular'));
+        await tester.pumpAndSettle();
+        expect(find.text('Retirada do titular').hitTestable(), findsOneWidget);
         await tester.tap(find.text('Retirada do titular'));
+        expect(editCalls, 1);
+        expect(editedEntryId, 'withdrawal:history:business');
         expect(find.textContaining('Negócio → Pessoal'), findsWidgets);
         expect(find.text('- R\$ 300,00'), findsOneWidget);
         expect(tester.takeException(), isNull);
