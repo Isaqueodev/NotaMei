@@ -101,6 +101,12 @@ flutter build apk --debug
 
 O arquivo gerado fica em `build/app/outputs/flutter-apk/app-debug.apk`. Se for instalar manualmente com ADB, use `adb install -r build/app/outputs/flutter-apk/app-debug.apk` com a depuração USB autorizada no dispositivo. Antes de apresentar, abra o aplicativo no próprio telefone e confira o fluxo desejado; depois da instalação, a execução normal não depende de ADB.
 
+## Assinatura para distribuição Android
+
+O build `release` exige uma chave própria fora do repositório e credenciais efêmeras no ambiente do processo. **Não há fallback para a assinatura debug.** O build de depuração acima continua disponível sem essas credenciais.
+
+Consulte [configuração, bloqueios e validação da assinatura](docs/entrega/ASSINATURA-ANDROID.md). A configuração não publica uma release nem autoriza substituir o aplicativo já instalado no celular.
+
 ## Visual V5 Editorial B
 
 O novo visual está implementado em Flutter no Início, Histórico, formulário/edição, Ano, tour e Ajustes/DAS. Preserva a marca N, usa fontes locais Inter e Playfair Display e destaca **entradas em verde** e **saídas em vermelho**. No Início, a ação de novo lançamento fica no fluxo, sem botão flutuante sobre os registros. V5 é o nome da família visual; não altera a versão do produto para 5.0.
