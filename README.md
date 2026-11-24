@@ -90,7 +90,6 @@ Os lembretes dependem de permissão de notificações e das políticas de agenda
 
 As orientações de contribuição são independentes de ferramenta de IA ou assinatura paga. Não é necessário usar Hermes para desenvolver o projeto; cada colaborador deve conferir seu ambiente, trabalhar em um escopo pequeno e submeter as alterações à revisão.
 
-- [Checklist de Matheus Rocha, Raphael Max e Luchie Bonates](docs/colaboracao/CHECKLIST-EQUIPE.md), com papéis propostos, prioridades e critérios de aceite.
 - [Diagnóstico do repositório e limites da inspeção](docs/colaboracao/DIAGNOSTICO-REPOSITORIO.md).
 - [Benchmark de funcionalidades e esforço relativo](docs/colaboracao/BENCHMARK-FUNCIONALIDADES.md).
 - [Guia para trabalhar com IA](docs/colaboracao/GUIA-IA-EQUIPE.md) e [contrato de tarefa pequena](docs/colaboracao/TAREFA-PARA-IA.md).
