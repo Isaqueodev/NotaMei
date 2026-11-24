@@ -10,12 +10,32 @@ O NotaMei é um aplicativo Android desenvolvido em Flutter para ajudar a registr
 
 A [pré-release **v1.0.0-beta.1**](https://github.com/Isaqueodev/NotaMei/releases/tag/v1.0.0-beta.1) foi publicada no GitHub em **23/11/2026**, com APK Android **1.0.0-beta.1, build 7**, assinado com a identidade definitiva do projeto, e arquivo `SHA256SUMS.txt`.
 
-**Acesso atual:** o repositório e a release permanecem privados; o link exige as permissões correspondentes no GitHub. A abertura ao público é uma etapa separada, condicionada à revisão de privacidade. A existência de licença MIT não significa, por si só, que o código já esteja publicamente acessível.
+**Código e beta públicos:** o repositório está aberto sob [licença MIT](LICENSE), e a pré-release pode ser consultada e baixada sem acesso de colaborador. A disponibilidade pública não transforma o MVP em versão estável nem comprova validação ampla com usuários.
 
 - Baixe `notamei-1.0.0-beta.1-build7-android.apk` e confira seu SHA-256 com `SHA256SUMS.txt` na mesma release.
 - Esta é uma **beta de avaliação**, não uma versão estável nem uma publicação na Play Store. Não há binário iOS nesta entrega.
 - O APK foi conferido quanto a assinatura, certificado, pacote, versão, arquiteturas e integridade. **O binário desta beta ainda não foi instalado ou exercitado em aparelho.** Ensaios anteriores com APK debug não equivalem ao aceite deste arquivo.
 - A identidade de assinatura difere dos APKs debug anteriores. **Não desinstale, não limpe dados nem force downgrade para substituir uma instalação existente.** A migração precisa preservar o histórico e ser validada separadamente.
+
+## Pesquisa e contexto extensionista
+
+O NotaMei não se baseia apenas em uma proposta de software: há um diagnóstico exploratório e uma avaliação posterior do protótipo, com questionário de feedback e entrevista semiestruturada registrados. Essas etapas têm objetivos e limites diferentes:
+
+| Etapa | Evidência registrada | O que permite afirmar |
+| --- | --- | --- |
+| Diagnóstico inicial | Nove respostas de questionário, conforme o registro acadêmico histórico do projeto. | Subsídio exploratório para compreender o problema e formular requisitos; não representa a população de MEIs e não equivale a nove testes do aplicativo. |
+| Avaliação do protótipo | Uma pessoa MEI respondeu a um questionário de feedback e a uma entrevista semiestruturada: dois instrumentos complementares da mesma pessoa. | Há entrevista e retorno individual sobre o protótipo; não são duas pessoas, uma amostra ampla ou prova de adoção sustentada. |
+| Verificação técnica | Testes automatizados e ensaios Android identificados na documentação. | Evidências de funcionamento nos cenários exercitados; não substituem avaliação pela comunidade nem medem impacto financeiro. |
+
+As contagens de diagnóstico e avaliação não são somadas como pessoas distintas: a possível sobreposição não foi verificada. O número do diagnóstico é um registro histórico, não uma nova coleta ou recontagem dos instrumentos nesta revisão.
+
+A avaliação apontou necessidades de continuidade entre meses, consulta de despesas anuais e clareza na separação Negócio/Pessoal. Continuidade histórica e despesas anuais foram incorporadas ao código; isso não significa que a versão resultante tenha sido novamente aprovada pelo participante. Outras sugestões permanecem propostas, não funcionalidades prometidas.
+
+- [Síntese da avaliação, origem dos instrumentos e limites metodológicos](docs/avaliacao/FEEDBACK-MEI-2026-11-04.md).
+- [Melhorias rastreadas aos feedbacks e situação de implementação](docs/avaliacao/BACKLOG-MELHORIAS.md).
+- [Requisitos e decisões de arquitetura](docs/arquitetura/C4-NOTAMEI.md).
+
+Os instrumentos preenchidos, contatos, assinaturas, imagens e dados identificáveis permanecem fora do GitHub. Publicar o código não autoriza publicar esses materiais. As evidências públicas são sínteses; eventual apresentação dos originais à banca deve ocorrer por meio reservado e com autorização adequada. Não se declara representatividade, parceria formal, impacto comunitário medido ou devolutiva concluída sem evidência própria.
 
 ## O que é possível fazer
 
@@ -64,7 +84,7 @@ Os lembretes dependem de permissão de notificações e das políticas de agenda
 - **Não apura obrigações fiscais:** o resumo anual usa registros manuais do negócio. Não certifica faturamento fiscal, lucro, limite legal, regularidade ou meses sem movimento.
 - **Exportação CSV/PDF não é backup nem documento fiscal:** os relatórios servem para levar os dados para fora do app; não podem restaurar o banco e não comprovam faturamento, regularidade ou quitação. Consulte [CSV](docs/hermes/EXPORTACAO-CSV.md) e [PDF](docs/hermes/EXPORTACAO-PDF.md).
 - **Não consulta nem paga o DAS:** o dia do lembrete é escolhido por você, **não** é um vencimento legal calculado pelo app. O aviso não confirma emissão, pagamento ou quitação. Consulte os canais oficiais e, quando necessário, orientação contábil.
-- **Beta não é versão estável:** há uma pré-release assinada no GitHub, com acesso restrito. Ela ainda requer validação do binário exato em ambiente Android seguro e não garante compatibilidade ou ausência de defeitos em todos os aparelhos.
+- **Beta não é versão estável:** há uma pré-release assinada disponível publicamente no GitHub. Ela ainda requer validação do binário exato em ambiente Android seguro e não garante compatibilidade ou ausência de defeitos em todos os aparelhos.
 
 ## Colaboração da equipe e uso de IA
 
@@ -148,7 +168,7 @@ O [documento de implementação V5](docs/hermes/V5-IMPLEMENTACAO.md) registra um
 
 ## Estado do projeto
 
-Esta versão cobre uso manual, **relatórios CSV/PDF** e **criação/importação aditiva de backup JSON**, acessíveis em Ajustes. **Substituição integral do histórico, restauração de preferências, sincronização, integrações externas e regras fiscais automáticas não estão implementadas**. Relatórios não são restauráveis nem documentos fiscais. Documentos privados de pesquisa e referências de terceiros não fazem parte da distribuição.
+Esta versão cobre uso manual, **relatórios CSV/PDF** e **criação/importação aditiva de backup JSON**, acessíveis em Ajustes. **Substituição integral do histórico, restauração de preferências, sincronização, integrações externas e regras fiscais automáticas não estão implementadas**. Relatórios não são restauráveis nem documentos fiscais. Instrumentos preenchidos de pesquisa e referências privadas de terceiros não fazem parte da distribuição.
 
 **Backup financeiro:** a [criação](docs/backup/INTERFACE-CRIACAO.md) usa o [serviço de saída](docs/backup/CRIACAO.md) e o [formato v1](docs/backup/FORMATO-V1.md). A [importação](docs/backup/IMPORTACAO.md) integra seletor Android com leitura limitada, prévia congelada e gravação transacional aditiva. JSON continua legível, sem senha/criptografia; não inclui preferências. Há testes com canais simulados/SQLite temporário e ensaios Android anteriores em build debug. Isso não valida automaticamente o APK desta beta, todos os provedores de arquivos ou os recursos assistivos.
 
@@ -168,6 +188,6 @@ A organização aproveita boas práticas de requisitos e C4 de um enunciado acad
 
 - Não envie bancos reais, backups financeiros, respostas individuais de pesquisa, contatos, fotos sem autorização, logs privados, senhas ou keystores ao Git, às issues/PRs ou aos anexos de releases.
 - Use dados fictícios em testes e demonstrações. Não presuma anonimização apenas porque observações foram omitidas de um relatório.
-- `.gitignore` ajuda a evitar inclusões comuns, mas não remove histórico nem protege arquivos já rastreados ou adicionados com força. Uma revisão de privacidade antecede qualquer mudança para acesso público.
+- `.gitignore` ajuda a evitar inclusões comuns, mas não remove histórico nem protege arquivos já rastreados ou adicionados com força. A abertura do repositório não elimina cópias antigas ou referências retidas; revise conteúdo, histórico e anexos ao publicar.
 - O certificado público de assinatura, seu fingerprint, hashes do APK, nomes de variáveis e identificação do pacote não são a chave privada. A chave e suas senhas permanecem fora da distribuição.
 - Código sob [licença MIT](LICENSE). Fontes e demais recursos preservam suas licenças e avisos próprios.
